@@ -226,6 +226,34 @@ input[type=text],input[type=date],input[type=number],input[type=password]{backgr
 .pcard .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
 .pcard .meta{font-size:12.5px;color:var(--muted)}
 .pcard .el{margin-left:auto;font-family:var(--f-mono);font-weight:600;font-size:17px}
+.psearch{position:relative;max-width:480px}
+.psearch input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 70px 9px 11px;min-height:44px;font-weight:500;-webkit-appearance:none;appearance:none}
+.psearch input:focus{outline:2px solid var(--sea);outline-offset:1px}
+.psearch .pcount{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12.5px;color:var(--muted);pointer-events:none}
+.pres{margin-top:8px;max-width:640px}
+.pres-t{margin:4px 0 6px;font-size:13px;color:var(--muted)}
+.pchips{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;cursor:pointer;max-width:100%;text-align:left}
+.pchip:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+@media (hover:hover){.pchip:hover{border-color:var(--sea)}}
+.pchip.new{border-style:dashed;color:var(--sea);font-weight:500}
+.plist-tg{margin-top:8px;padding-left:0}
+.plistbox{margin-top:6px;max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.plist-l{position:sticky;top:0;background:var(--bg);font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted);padding:3px 12px;border-bottom:1px solid var(--line)}
+.prow{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:8px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-weight:600;text-align:left;cursor:pointer}
+.prow:last-child{border-bottom:0}
+@media (hover:hover){.prow:hover{background:var(--bg)}}
+.prow:focus-visible{outline:2px solid var(--sea);outline-offset:-2px}
+.pchip.new b{font-weight:700}
+.pcw{position:relative;display:flex;min-width:0}
+.pcw .pcard{flex:1;padding-right:52px;min-width:0}
+.pedit{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;border-radius:8px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.pedit:focus-visible{outline:2px solid var(--sea)}
+@media (hover:hover){.pedit:hover{background:var(--bg);color:var(--ink)}}
+.pinline{flex-wrap:wrap;gap:8px;cursor:default;border-color:var(--sea)}
+.pinline input{flex:1 1 140px;min-width:0}
+.pinline-btns{display:flex;gap:6px}
+@media (max-width:760px){input,select,textarea{font-size:16px!important}}
 .phead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
 .phead h2{font-size:30px;font-weight:800;min-width:0;overflow-wrap:anywhere}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
@@ -303,6 +331,26 @@ input[type=text],input[type=date],input[type=number],input[type=password]{backgr
 .prose ol{margin:0 0 10px;padding-left:20px;max-width:68ch}
 .prose li{margin-bottom:6px}
 .tiers{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}
+.rlegend{margin-bottom:14px}
+.gtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#6B4E16;background:#F3E3B8;border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle;white-space:nowrap;line-height:1.5}
+.gtag.sm{font-size:10px;padding:0 5px}
+.gtag.lg{font-size:12px;padding:2px 8px;margin-left:0}
+.pcard .meta .gtag{margin-left:0;margin-right:4px}
+.pcard .ready{color:var(--sea);font-weight:700}
+.d.gx{background:#F3E3B8;color:#6B4E16;font-size:11px;font-weight:700;font-family:var(--f-body);text-transform:uppercase;letter-spacing:.03em}
+.gnote{margin:8px 0 0;font-size:13px;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px}
+.seg label{display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer}
+.seg input{accent-color:var(--sea);width:18px;height:18px;margin:0}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:560px){.rgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:860px){.rgrid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.rbox{display:flex;align-items:flex-start;gap:7px;padding:8px 9px;border:1px solid var(--line);border-radius:10px;background:var(--bg);min-width:0}
+.rbox.has{border-color:var(--tc);background:color-mix(in srgb,var(--tc) 9%,var(--surface))}
+.rbox .hx{width:16px;height:16px;flex:none;margin-top:2px}
+.rbox b{display:block;font-size:13.5px;line-height:1.25}
+.rbox .rr{display:block;font-size:12px;color:var(--muted);line-height:1.3;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rbox .rn{display:block;font-size:11.5px;font-weight:600;color:var(--ink);margin-top:2px}
 .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .kv div{background:var(--surface-2);border-radius:8px;padding:8px 12px}
 .kv span{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
@@ -366,7 +414,7 @@ try { initial = JSON.parse(document.getElementById('league-data').textContent); 
 
 const S = {
   data: normalize(initial), mode: 'loading', canWrite: false, adminOn: false, busy: false, admins: null, authMode: 'login',
-  tab: 'ranking', sel: null, draft: null, confirm: null, open: new Set(), flash: null, editName: false
+  tab: 'ranking', sel: null, draft: null, confirm: null, open: new Set(), flash: null, editName: false, inlineEdit: null
 };
 let C = null;
 const isAssetId = x => typeof x === 'string' && /^p\/[0-9a-f-]{36}\.(jpg|png|webp)$/.test(x);
@@ -421,20 +469,38 @@ function champTitles() {
 const ORD = ['', 'Primer', 'Segundo', 'Tercer', 'Cuarto', 'Quinto', 'Sexto'];
 const MULTI = ['', '', 'Bicampeón', 'Tricampeón', 'Tetracampeón', 'Pentacampeón'];
 
+/* ===== Socios e invitados ===== */
+const MIN_SOCIOS = 3, GUEST_GAMES = 3;
+const localDay = ms => { const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const isGuest = id => !!((S.data.cfg.guest || {})[id]);
+function socioAt(cfg, id, g) {
+  if ((cfg.guest || {})[id]) return false;
+  const j = (cfg.joined || {})[id]; if (!j) return true;
+  const jd = localDay(j);
+  return g.date !== jd ? g.date > jd : (g.createdAt || Date.now()) >= j;
+}
+const gtag = (id, extra = '') => isGuest(id) ? `<span class="gtag ${extra}">Invitado</span>` : '';
+const dcell = r => r.x === 'guest' ? '<span class="d gx">Invitado</span>' : r.x === 'nocount' ? '<span class="d zero">No cuenta</span>' : (dd => `<span class="d ${dcls(dd)}">${sgn(dd)}</span>`)(r0(r.post) - r0(r.pre));
+
 /* ===== Elo engine: replay every game in date order from the base rating ===== */
 function compute(ps, games, cfg) {
   const R = {}, N = {}, H = {};
   ps.forEach(p => { R[p.id] = cfg.base; N[p.id] = 0; H[p.id] = []; });
   const order = games.slice().sort((a,b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : (a.createdAt||0) - (b.createdAt||0)));
-  const G = {}, num = {};
+  const G = {}, num = {}, P = {}, GP = {}, CNT = {};
   let idx = 0;
   for (const g of order) {
-    const res = (g.results || []).filter(r => R[r.playerId] !== undefined && Number.isFinite(+r.vp));
-    if (res.length < 2) continue;
-    const byPlace = res.every(r => Number.isFinite(+r.place) && +r.place > 0);
+    const all = (g.results || []).filter(r => R[r.playerId] !== undefined && Number.isFinite(+r.vp));
+    if (all.length < 2) continue;
+    const byPlace = all.every(r => Number.isFinite(+r.place) && +r.place > 0);
     const score = r => byPlace ? -(+r.place) : +r.vp;
     idx++; num[g.id] = idx;
-    const pre = {}; res.forEach(r => pre[r.playerId] = R[r.playerId]);
+    const soc = all.filter(r => socioAt(cfg, r.playerId, g));
+    all.forEach(r => { P[r.playerId] = (P[r.playerId] || 0) + 1; if (!soc.includes(r)) GP[r.playerId] = (GP[r.playerId] || 0) + 1; });
+    const counts = soc.length >= MIN_SOCIOS;
+    CNT[g.id] = { counts, socios: soc.length, guests: all.length - soc.length };
+    const res = counts ? soc : [];
+    const pre = {}; all.forEach(r => pre[r.playerId] = R[r.playerId]);
     const rows = res.map(r => {
       const kGame = N[r.playerId] < cfg.provGames ? cfg.kProv : cfg.k;
       const k = cfg.perRival ? kGame : kGame / (res.length - 1);
@@ -450,12 +516,14 @@ function compute(ps, games, cfg) {
       if (cfg.cap > 0) delta = Math.max(-cfg.cap, Math.min(cfg.cap, delta));
       return { playerId: r.playerId, vp: +r.vp, sc: score(r), color: COLORS[r.color] ? r.color : null, pre: pre[r.playerId], k, raw, capped: raw !== delta, delta, duels };
     });
-    rows.forEach(row => { row.place = 1 + rows.filter(o => o.sc > row.sc).length; });
+    const extra = all.filter(r => !res.includes(r)).map(r => ({ playerId: r.playerId, vp: +r.vp, sc: score(r), color: COLORS[r.color] ? r.color : null, pre: pre[r.playerId], post: pre[r.playerId], k: 0, raw: 0, capped: false, delta: 0, duels: [], x: soc.includes(r) ? 'nocount' : 'guest' }));
+    const allRows = rows.concat(extra);
+    allRows.forEach(row => { row.place = 1 + allRows.filter(o => o.sc > row.sc).length; });
     rows.forEach(row => {
       R[row.playerId] = row.pre + row.delta; row.post = R[row.playerId]; N[row.playerId]++;
-      H[row.playerId].push({ gameId: g.id, date: g.date, num: idx, size: rows.length, ...row });
+      H[row.playerId].push({ gameId: g.id, date: g.date, num: idx, size: allRows.length, ...row });
     });
-    G[g.id] = rows.sort((a,b) => a.place - b.place || b.post - a.post);
+    G[g.id] = allRows.sort((a,b) => a.place - b.place || (!!a.x - !!b.x) || b.post - a.post);
   }
   const fav = {};
   for (const id in H) {
@@ -465,7 +533,7 @@ function compute(ps, games, cfg) {
     for (const k in t) if (!best || t[k].n > t[best].n || (t[k].n === t[best].n && t[k].last > t[best].last)) best = k;
     fav[id] = best;
   }
-  return { R, N, H, G, order: order.filter(g => G[g.id]), num, fav };
+  return { R, N, H, G, order: order.filter(g => G[g.id]), num, fav, P, GP, CNT };
 }
 function playerStats(id) {
   const h = C.H[id] || [], cfg = S.data.cfg;
@@ -618,7 +686,8 @@ function vRanking() {
   const cfg = S.data.cfg;
   const head = `<div class="sec-head"><div><h2>Ranking</h2><p>Todos empiezan en ${cfg.base.toLocaleString('es-MX')} puntos. Después de cada partida tu Elo sube o baja según el lugar en que quedaste y el nivel de los rivales que tenías en la mesa.</p></div><button class="btn primary" data-go="partida">${regLbl()}</button></div>`;
   if (!players().length) return head + emptyState();
-  const list = players().map(p => ({ p, s: playerStats(p.id) }))
+  const nGuests = players().filter(p => isGuest(p.id)).length;
+  const list = players().filter(p => !isGuest(p.id)).map(p => ({ p, s: playerStats(p.id) }))
     .sort((a,b) => (b.s.n > 0) - (a.s.n > 0) || b.s.elo - a.s.elo || a.p.name.localeCompare(b.p.name));
   const played = list.filter(x => x.s.n > 0);
   let pod = '';
@@ -641,8 +710,11 @@ function vRanking() {
       <td class="r wide">${spark(x.s.h)}</td>
     </tr>`;
   }).join('');
-  return head + pod + `<div class="panel tbl-wrap"><table class="rk"><thead><tr class="grp"><th rowspan="2">#</th><th rowspan="2">Jugador</th><th rowspan="2" class="r">Elo</th><th rowspan="2" class="r">PJ</th><th colspan="4" class="pc pg">Lugares</th><th rowspan="2">Color</th><th rowspan="2" class="r wide">Última</th><th rowspan="2" class="r wide">Tendencia</th></tr><tr><th class="pc p1">1º</th><th class="pc">2º</th><th class="pc">3º</th><th class="pc p4">4º</th></tr></thead><tbody>${rows}</tbody></table></div>
-  <p class="hint">PJ: partidas jugadas. Lugares: cuántas veces quedó en 1º, 2º, 3º y 4º. Color: el que más ha usado.</p>`;
+  const tcount = {}; played.forEach(x => { if (x.s.n >= cfg.provGames) { const t = tierOf(x.s.elo)[1]; tcount[t] = (tcount[t] || 0) + 1; } });
+  const legend = `<div class="panel pad rlegend"><p class="lbl" style="margin:0 0 8px">Rangos según tu Elo</p><div class="rgrid">${TIERS.map((t,i) => { const n = tcount[t[1]] || 0; const range = i === 0 ? `Menos de ${TIERS[1][0].toLocaleString('es-MX')}` : i === TIERS.length - 1 ? `${t[0].toLocaleString('es-MX')} o más` : `${t[0].toLocaleString('es-MX')} a ${(TIERS[i+1][0] - 1).toLocaleString('es-MX')}`;
+    return `<div class="rbox ${n ? 'has' : ''}" style="--tc:${t[2]}"><svg class="hx" viewBox="0 0 24 24" style="fill:${t[2]}" aria-hidden="true">${HEX}</svg><div style="min-width:0"><b>${t[1]}</b><span class="rr">${range}</span>${n ? `<span class="rn">${n} jugador${n === 1 ? '' : 'es'}</span>` : ''}</div></div>`; }).join('')}</div></div>`;
+  return head + pod + legend + `<div class="panel tbl-wrap"><table class="rk"><thead><tr class="grp"><th rowspan="2">#</th><th rowspan="2">Jugador</th><th rowspan="2" class="r">Elo</th><th rowspan="2" class="r">PJ</th><th colspan="4" class="pc pg">Lugares</th><th rowspan="2">Color</th><th rowspan="2" class="r wide">Última</th><th rowspan="2" class="r wide">Tendencia</th></tr><tr><th class="pc p1">1º</th><th class="pc">2º</th><th class="pc">3º</th><th class="pc p4">4º</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="hint">PJ: partidas jugadas que cuentan para el Elo. Lugares: cuántas veces quedó en 1º, 2º, 3º y 4º. Color: el que más ha usado. Solo aparecen socios del club${nGuests ? ` (hay ${nGuests} invitado${nGuests===1?'':'s'}, ver en Jugadores)` : ''}. Una partida cuenta si en la mesa hay mínimo ${MIN_SOCIOS} socios.</p>`;
 }
 function emptyState() {
   const ex = [['Ana',1087,'+14',9,4],['Luis',1032,'−6',9,2],['Marce',996,'+21',8,2],['Diego',941,'−18',8,1]];
@@ -667,7 +739,7 @@ function spark(h) {
   return `<svg width="${w}" height="${ht}" viewBox="0 0 ${w} ${ht}" aria-hidden="true" style="display:inline-block;vertical-align:middle"><path d="${d}" fill="none" style="stroke:var(--${up?'up':'down'})" stroke-width="1.6" stroke-linejoin="round"/><circle cx="${end[0]}" cy="${end[1]}" r="2.6" style="fill:var(--${up?'up':'down'})"/></svg>`;
 }
 
-function newDraft() { return { id: null, createdAt: null, date: today(), notes: '', picked: [], vp: {}, color: {}, place: {}, manual: false, photo: null, pBlob: null, pUrl: null }; }
+function newDraft() { S.addq = ''; S.addAll = false; return { id: null, createdAt: null, date: today(), notes: '', picked: [], vp: {}, color: {}, place: {}, manual: false, photo: null, pBlob: null, pUrl: null }; }
 function photoPicker() {
   const D = S.draft;
   const src = D.pUrl || (isAssetId(D.photo) ? blobUrl(D.photo) : null);
@@ -727,6 +799,35 @@ function parseShare(txt) {
   return { draft: D, dup };
 }
 
+const fold = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+function pickResults() {
+  const D = S.draft; if (!D) return '';
+  const left = players().filter(p => !D.picked.includes(p.id));
+  const q = fold(S.addq);
+  const btn = p => `<button type="button" class="pchip" data-pick="${p.id}">${dot(p.id)}${esc(p.name)}${gtag(p.id, 'sm')}</button>`;
+  if (!q) {
+    const cnt = {}; [...S.data.games].sort((a,b) => (b.date || '').localeCompare(a.date || '')).slice(0, 40).forEach(g => (g.results || []).forEach(r => { cnt[r.playerId] = (cnt[r.playerId] || 0) + 1; }));
+    const freq = left.filter(p => cnt[p.id]).sort((a,b) => cnt[b.id] - cnt[a.id] || a.name.localeCompare(b.name)).slice(0, 8);
+    const pool = freq.length ? freq : left.length <= 8 ? [...left].sort((a,b) => a.name.localeCompare(b.name)) : [];
+    const all = [...left].sort((a,b) => a.name.localeCompare(b.name, 'es'));
+    const top = pool.length ? `<p class="pres-t">${freq.length ? 'Juegan seguido' : 'Jugadores'}</p><div class="pchips">${pool.map(btn).join('')}</div>` : `<p class="pres-t">Escribe para buscar: la lista se va filtrando con cada letra.</p>`;
+    const more = left.length > pool.length ? `<button type="button" class="btn sm ghost plist-tg" data-act="addall" aria-expanded="${S.addAll ? 'true' : 'false'}">${S.addAll ? 'Ocultar lista' : `Ver lista completa (${left.length})`}</button>` : '';
+    let lastL = '';
+    const box = S.addAll && more ? `<div class="plistbox" role="list">${all.map(p => { const L = fold(p.name).charAt(0).toUpperCase(); const h = L !== lastL ? `<div class="plist-l">${esc(L)}</div>` : ''; lastL = L; return h + `<button type="button" class="prow" data-pick="${p.id}" role="listitem">${dot(p.id)}<span>${esc(p.name)}</span>${gtag(p.id, 'sm')}</button>`; }).join('')}</div>` : '';
+    return top + more + box;
+  }
+  const words = q.split(/\s+/);
+  const scored = left.map(p => { const n = fold(p.name), parts = n.split(/\s+/);
+      if (!words.every(w => n.includes(w))) return null;
+      const sc = n.startsWith(q) ? 0 : words.every(w => parts.some(x => x.startsWith(w))) ? 1 : 2;
+      return { p, sc }; }).filter(Boolean).sort((a,b) => a.sc - b.sc || a.p.name.localeCompare(b.p.name));
+  const shown = scored.slice(0, 12).map(x => x.p);
+  const raw = String(S.addq || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+  const exact = players().some(p => fold(p.name) === q);
+  const create = isAdmin() && raw && !exact && !shown.length ? `<button type="button" class="pchip new" data-newp="${esc(raw)}" data-ptype="invitado">+ Agregar <b>${esc(raw)}</b> como invitado</button><button type="button" class="pchip new" data-newp="${esc(raw)}" data-ptype="socio">+ Agregar <b>${esc(raw)}</b> como socio</button>` : '';
+  if (!shown.length) return `<p class="pres-t">No hay nadie con "${esc(raw)}".${isAdmin() ? '' : ' Pídele al admin que lo dé de alta.'}</p>${create ? `<div class="pchips">${create}</div>` : ''}`;
+  return `<div class="pchips">${shown.map(btn).join('')}${create}</div>${scored.length > shown.length ? `<p class="pres-t">Hay ${scored.length - shown.length} más. Escribe más letras para encontrarlo.</p>` : ''}`;
+}
 function vPartida() {
   if (!S.draft || (S.draft.id && !isAdmin())) S.draft = newDraft();
   const D = S.draft;
@@ -739,9 +840,10 @@ function vPartida() {
     <div class="actions" style="margin-top:10px"><button type="button" class="btn primary" data-act="copyshare">Copiar de nuevo</button><a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(S.shareOut)}" target="_blank" rel="noopener">Abrir WhatsApp</a><button type="button" class="btn ghost" data-act="newshare">Registrar otra</button></div></div>` : '';
   const left = [...players()].filter(p => !D.picked.includes(p.id)).sort((a,b) => a.name.localeCompare(b.name));
   const full = D.picked.length >= 6;
-  const chips = `<select class="sel empty" id="addp" data-addp="1" ${full || !left.length ? 'disabled' : ''} style="max-width:420px">
-    <option value="">${full ? 'Máximo 6 jugadores' : left.length ? `Agregar jugador (${D.picked.length} de 6)…` : 'Ya están todos los jugadores'}</option>
-    ${left.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select>`;
+  const chips = full
+    ? `<p class="hint" style="margin:6px 0 0">Ya van 6 jugadores, el máximo por partida.</p>`
+    : !left.length ? `<p class="hint" style="margin:6px 0 0">Ya están todos los jugadores de la liga.</p>`
+    : `<div class="psearch"><input type="search" id="addq" data-addq="1" placeholder="Busca por nombre o apellido" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="done" aria-label="Buscar jugador" value="${esc(S.addq || '')}"><span class="pcount">${D.picked.length} de 6</span></div><div id="addres" class="pres" aria-live="polite">${pickResults()}</div>`;
   const imp = adm && !D.id ? `<details class="panel pad imp" style="margin-bottom:14px" ${D.picked.length ? '' : 'open'}><summary style="cursor:pointer;font-weight:700">¿Te mandaron una partida por WhatsApp? Impórtala aquí</summary>
     <form id="impform" autocomplete="off" style="margin-top:10px"><p class="hint" style="margin:0 0 8px">Pega el mensaje completo, incluida la línea que empieza con LEC1-. La partida se llena sola abajo para que la revises y la guardes.</p>
       <textarea id="imp-text" aria-label="Mensaje de la partida" placeholder="Partida Liga Elo Catan Club MTY · …&#10;Código para importar:&#10;LEC1-…"></textarea>
@@ -753,7 +855,7 @@ function vPartida() {
       <label class="f">Notas (opcional)<input type="text" id="g-notes" value="${esc(D.notes)}" placeholder="Ej. Navegantes, mapa aleatorio" maxlength="80"></label>
     </div>
     ${adm ? `<div style="margin-top:16px"><p class="lbl">Foto del tablero</p><div id="photobox">${photoPicker()}</div></div>` : ''}
-    <div style="margin-top:16px"><label class="lbl" for="addp" style="display:block">¿Quién jugó?</label>${chips}</div>
+    <div style="margin-top:16px"><label class="lbl" for="addq" style="display:block">¿Quién jugó?</label>${chips}</div>
     <div id="vpbox" style="margin-top:16px">${vpRows()}</div>
     <div class="preview" id="preview">${previewHtml()}</div>
     <div class="actions">
@@ -769,7 +871,7 @@ function vpRows() {
   return `<div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px"><p class="lbl">Resultado de cada jugador</p><button type="button" class="linkbtn" id="autoplace" data-act="autoplace" ${D.manual ? '' : 'hidden'}>Ordenar lugares por puntos</button></div><div class="vprows">${D.picked.map(id => {
     const used = new Set(D.picked.filter(p => p !== id).map(p => D.color[p]).filter(Boolean));
     return `
-    <div class="vprow"><div class="pname">${sw(D.color[id])}<b style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pname(id)}</b><button type="button" class="linkbtn" data-pick="${id}" aria-label="Quitar a ${pname(id)} de la partida" style="font-size:12.5px;margin-left:4px">Quitar</button></div>
+    <div class="vprow"><div class="pname">${sw(D.color[id])}<b style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pname(id)}</b>${gtag(id, 'sm')}<button type="button" class="linkbtn" data-pick="${id}" aria-label="Quitar a ${pname(id)} de la partida" style="font-size:12.5px;margin-left:4px">Quitar</button></div>
     <div class="stepper"><button type="button" data-vp="${id}" data-step="-1" aria-label="Restar un punto">−</button>
     <input type="number" inputmode="numeric" min="0" max="30" id="vp-${id}" data-vpin="${id}" value="${esc(D.vp[id] ?? '')}" placeholder="PV" aria-label="Puntos de ${pname(id)}">
     <button type="button" data-vp="${id}" data-step="1" aria-label="Sumar un punto">+</button></div>
@@ -803,11 +905,11 @@ function previewHtml() {
   const data = { id: '__draft', ...draftData() };
   const games = S.data.games.filter(g => g.id !== S.draft.id).concat([data]);
   const c = compute(players(), games, S.data.cfg);
-  const rows = c.G['__draft'] || [];
-  return `<p class="lbl">Así cambiaría el Elo</p><div class="gl">${rows.map(r => {
-    const dd = r0(r.post) - r0(r.pre);
-    return `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span><span class="d ${dcls(dd)}">${sgn(dd)}</span><span class="after">${r0(r.pre)} → ${r0(r.post)}</span>`;
-  }).join('')}</div>`;
+  const rows = c.G['__draft'] || [], k = c.CNT['__draft'] || { counts: true, socios: rows.length, guests: 0 };
+  const note = !k.counts ? `<div class="warn">Esta partida se guarda pero <b>no cuenta para el Elo</b>: hay ${k.socios} socio${k.socios===1?'':'s'} y se necesitan mínimo ${MIN_SOCIOS}.</div>` : k.guests ? `<p class="hint" style="margin:0 0 8px">Los invitados quedan registrados pero no suman ni restan Elo a nadie. El Elo se calcula solo entre los socios.</p>` : '';
+  return `<p class="lbl">${k.counts ? 'Así cambiaría el Elo' : 'Resultado'}</p>${note}<div class="gl">${rows.map(r =>
+    `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x ? '' : `${r0(r.pre)} → ${r0(r.post)}`}</span>`
+  ).join('')}</div>`;
 }
 
 function vPartidas() {
@@ -822,10 +924,11 @@ function vPartidas() {
       : `<button class="btn sm ghost" data-editgame="${g.id}">Editar</button><button class="btn sm ghost" data-ask="g:${g.id}">Borrar</button>`;
     return `<article class="panel game ${S.flash===g.id?'fade':''}" id="game-${g.id}">
       <div class="ghead"><h3>Partida ${C.num[g.id]}</h3><span class="muted">${fmtDate(g.date)}</span>${g.notes ? `<span class="note">· ${esc(g.notes)}</span>` : ''}<span class="ga">${acts}</span></div>
-      <div class="gl">${rows.map(r => { const dd = r0(r.post) - r0(r.pre); return `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span><span class="d ${dcls(dd)}">${sgn(dd)}</span><span class="after">${r0(r.post)}</span>`; }).join('')}</div>
+      <div class="gl">${rows.map(r => `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x === 'guest' ? '' : r0(r.post)}</span>`).join('')}</div>
+      ${(k => !k ? '' : !k.counts ? `<p class="gnote">No cuenta para el Elo: ${k.socios} socio${k.socios===1?'':'s'} en la mesa, se necesitan mínimo ${MIN_SOCIOS}.</p>` : k.guests ? `<p class="gnote">Con invitado${k.guests===1?'':'s'}: el Elo se calculó solo entre los socios.</p>` : '')(C.CNT[g.id])}
       ${isAssetId(g.photo) ? `<button type="button" class="gphoto" data-lb="${g.photo}" aria-label="Ver foto del tablero de la partida ${C.num[g.id]}"><img data-photo src="${blobUrl(g.photo)}" alt="Foto del tablero de la partida ${C.num[g.id]}" loading="lazy"></button>` : ''}
-      <button class="btn sm ghost" style="margin-top:6px;padding-left:0" data-toggle="${g.id}" aria-expanded="${open}">${open ? 'Ocultar cálculo' : 'Ver cálculo'}</button>
-      ${open ? duelsHtml(rows) : ''}
+      ${C.CNT[g.id] && !C.CNT[g.id].counts ? '' : `<button class="btn sm ghost" style="margin-top:6px;padding-left:0" data-toggle="${g.id}" aria-expanded="${open}">${open ? 'Ocultar cálculo' : 'Ver cálculo'}</button>
+      ${open ? duelsHtml(rows.filter(r => !r.x)) : ''}`}
     </article>`;
   }).join('');
   return head + `<div class="stack">${cards}</div>`;
@@ -840,12 +943,35 @@ function duelsHtml(rows) {
 function vJugadores() {
   if (S.sel && playerById(S.sel)) return vPlayer(S.sel);
   S.sel = null;
-  const np = players().length;
-  const head = `<div class="sec-head"><div><h2>Jugadores</h2><p>${np ? `${np} en la liga. Toca a alguien para ver su histórico.` : `Cada jugador arranca con ${S.data.cfg.base.toLocaleString('es-MX')} de Elo.`}</p></div></div>`;
-  const add = !isAdmin() ? `<p class="hint" style="margin:-6px 0 14px">Para agregar jugadores, entra como admin en la pestaña Admin.</p>` : `<form id="pform" class="panel pad" autocomplete="off" style="margin-bottom:14px"><div class="addp"><input type="text" id="p-name" placeholder="Nombre del jugador" maxlength="200" aria-label="Nombres de jugadores"><button class="btn primary" type="submit">Agregar</button></div><p class="hint">Para agregar varios a la vez, sepáralos con comas: Ana, Luis, Marce.</p></form>`;
-  const list = players().map(p => ({ p, s: playerStats(p.id) })).sort((a,b) => b.s.elo - a.s.elo || a.p.name.localeCompare(b.p.name));
-  const cards = list.length ? `<div class="plist">${list.map(x => `<button class="pcard" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta">${x.s.n} partida${x.s.n===1?'':'s'} · ${x.s.wins} victoria${x.s.wins===1?'':'s'}</span></span><span class="el">${r0(x.s.elo)}</span></button>`).join('')}</div>` : (S.canWrite ? '' : '<div class="panel empty"><p>Aún no hay jugadores registrados.</p></div>');
+  const np = players().length, ng = players().filter(p => isGuest(p.id)).length;
+  const head = `<div class="sec-head"><div><h2>Jugadores</h2><p>${np ? `${np - ng} socio${np - ng === 1 ? '' : 's'}${ng ? ` y ${ng} invitado${ng === 1 ? '' : 's'}` : ''}. Toca a alguien para ver su histórico.${isAdmin() ? ' Usa el lápiz para cambiar un nombre.' : ''}` : `Cada jugador arranca con ${S.data.cfg.base.toLocaleString('es-MX')} de Elo.`}</p></div></div>`;
+  const add = !isAdmin() ? `<p class="hint" style="margin:-6px 0 14px">Para agregar jugadores, entra como admin en la pestaña Admin.</p>` : `<form id="pform" class="panel pad" autocomplete="off" style="margin-bottom:14px"><div class="addp"><input type="text" id="p-name" placeholder="Nombre del jugador" maxlength="200" aria-label="Nombres de jugadores"><button class="btn primary" type="submit">Agregar</button></div>
+    <div class="seg" role="radiogroup" aria-label="Tipo de jugador"><label><input type="radio" name="ptype" value="socio" checked><span><b>Socio</b> del club, sale en el ranking</span></label><label><input type="radio" name="ptype" value="invitado"><span><b>Invitado</b>, no cuenta para el Elo</span></label></div>
+    <p class="hint">Para agregar varios a la vez, sepáralos con comas: Ana, Luis, Marce. Un invitado puede hacerse socio después de ${GUEST_GAMES} partidas.</p></form>`;
+  const list = players().map(p => ({ p, s: playerStats(p.id), g: isGuest(p.id) })).sort((a,b) => (a.g - b.g) || (a.g ? (C.GP[b.p.id] || 0) - (C.GP[a.p.id] || 0) : b.s.elo - a.s.elo) || a.p.name.localeCompare(b.p.name));
+  const adm = isAdmin();
+  const card = x => { const gp = C.GP[x.p.id] || 0; return x.g
+    ? `<button class="pcard guest" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta"><span class="gtag">Invitado</span> ${gp >= GUEST_GAMES ? '<b class="ready">Listo para ser socio</b>' : `${gp} de ${GUEST_GAMES} partidas`}</span></span><span class="el muted">—</span></button>`
+    : `<button class="pcard" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta">${x.s.n} partida${x.s.n===1?'':'s'} · ${x.s.wins} victoria${x.s.wins===1?'':'s'}</span></span><span class="el">${r0(x.s.elo)}</span></button>`; };
+  const item = x => !adm ? card(x) : S.inlineEdit === x.p.id
+    ? `<form class="pcard pinline" id="iform" data-pid="${x.p.id}" autocomplete="off"><input type="text" id="i-name" value="${esc(x.p.name)}" maxlength="40" aria-label="Nuevo nombre de ${esc(x.p.name)}"><span class="pinline-btns"><button class="btn primary sm" type="submit">Guardar</button><button class="btn sm" type="button" data-act="noinline">Cancelar</button></span></form>`
+    : `<div class="pcw">${card(x)}<button type="button" class="pedit" data-inline="${x.p.id}" aria-label="Cambiar nombre de ${esc(x.p.name)}" title="Cambiar nombre"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;
+  const cards = list.length ? `<div class="plist">${list.map(item).join('')}</div>` : (S.canWrite ? '' : '<div class="panel empty"><p>Aún no hay jugadores registrados.</p></div>');
   return head + add + cards;
+}
+function memberBtns(id) {
+  if (!isAdmin()) return '';
+  if (isGuest(id)) {
+    const gp = C.GP[id] || 0;
+    if (S.confirm === 'm:' + id) return `<span class="confirm">Lleva ${gp} de ${GUEST_GAMES} partidas. ¿Hacerlo socio de todos modos?<button class="btn sm primary" data-mkmember="${id}" data-force="1">Sí, hacer socio</button><button class="btn sm" data-act="noconfirm">No</button></span>`;
+    return `<button class="btn sm ${gp >= GUEST_GAMES ? 'primary' : 'ghost'}" data-mkmember="${id}">Hacer socio</button>`;
+  }
+  return (C.H[id] || []).length ? '' : `<button class="btn sm ghost" data-mkguest="${id}">Cambiar a invitado</button>`;
+}
+function guestPanel(id) {
+  const gp = C.GP[id] || 0, j = (S.data.cfg.joined || {})[id];
+  if (!isGuest(id)) return j ? `<p class="hint" style="margin:8px 0 0">Socio desde el ${fmtDate(localDay(j))}. Sus partidas cuentan para el Elo a partir de esa fecha.</p>` : '';
+  return `<div class="notice" style="margin-top:14px"><span><b>Invitado.</b> Ha jugado ${gp} de ${GUEST_GAMES} partidas para poder hacerse socio. Sus partidas quedan registradas pero no suman ni restan Elo a nadie y no aparece en el ranking. ${gp >= GUEST_GAMES ? 'Ya cumple las partidas: un admin puede hacerlo socio.' : ''}</span></div>`;
 }
 function vPlayer(id) {
   const p = playerById(id), s = playerStats(id), cfg = S.data.cfg;
@@ -863,11 +989,11 @@ function vPlayer(id) {
   const conf = S.confirm === 'p:' + id;
   const manage = !isAdmin() ? '' : S.editName
     ? `<form id="rform" class="addp" style="margin-top:10px"><input type="text" id="r-name" value="${esc(p.name)}" maxlength="40" aria-label="Nuevo nombre"><button class="btn primary sm" type="submit">Guardar</button><button class="btn sm" type="button" data-act="norename">Cancelar</button></form>`
-    : `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px"><button class="btn sm ghost" data-act="rename">Cambiar nombre</button>${s.n === 0 ? (conf ? `<span class="confirm">¿Eliminar jugador?<button class="btn sm danger" data-delplayer="${id}">Eliminar</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn sm ghost" data-ask="p:${id}">Eliminar</button>`) : ''}</div>`;
+    : `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px"><button class="btn sm ghost" data-act="rename">Cambiar nombre</button>${memberBtns(id)}${!C.P[id] ? (conf ? `<span class="confirm">¿Eliminar jugador?<button class="btn sm danger" data-delplayer="${id}">Eliminar</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn sm ghost" data-ask="p:${id}">Eliminar</button>`) : ''}</div>`;
   return `<button class="btn ghost" data-act="back" style="padding-left:0;margin-bottom:8px">← Todos los jugadores</button>
-  <div class="phead">${sw(s.fav, 'lg')}<h2>${esc(p.name)}</h2>${(() => { const ys = (S.data.champions || []).filter(c => champKey(c.name) === champKey(p.name)).map(c => c.year).sort(); return ys.length ? `<button type="button" class="ptitle" data-tab="campeones">Campeón del torneo ${ys.join(' y ')}</button>` : ''; })()}${s.n === 0 ? '' : prov ? `<span class="prov">Posicionamiento ${s.n}/${cfg.provGames}</span>` : tierHtml(s.elo)}</div>
-  ${manage}
-  <div class="stack" style="margin-top:16px">
+  <div class="phead">${sw(s.fav, 'lg')}<h2>${esc(p.name)}</h2>${gtag(id, 'lg')}${(() => { const ys = (S.data.champions || []).filter(c => champKey(c.name) === champKey(p.name)).map(c => c.year).sort(); return ys.length ? `<button type="button" class="ptitle" data-tab="campeones">Campeón del torneo ${ys.join(' y ')}</button>` : ''; })()}${s.n === 0 ? '' : prov ? `<span class="prov">Posicionamiento ${s.n}/${cfg.provGames}</span>` : tierHtml(s.elo)}</div>
+  ${manage}${guestPanel(id)}
+  <div class="stack" style="margin-top:16px" ${isGuest(id) ? 'hidden' : ''}>
     <div class="stats">
       <div class="stat"><div class="k">Elo actual</div><div class="v big">${r0(s.elo)}</div></div>
       <div class="stat"><div class="k">Lugar</div><div class="v">${rank >= 0 ? rank + 1 + 'º' : '—'}</div></div>
@@ -959,6 +1085,7 @@ function vFormula() {
     <div class="formula" style="margin-top:8px">ajuste = K × (W − E)${S.data.cfg.perRival ? '   (redondeado)' : ''}</div>
     <p style="margin-top:12px">W vale 1 si quedaste arriba de ese rival, 0.5 si empataron y 0 si quedaste abajo. Se suman los ajustes contra todos tus rivales y ese es tu cambio de Elo de la partida${S.data.cfg.cap > 0 ? `, con un tope de ±${S.data.cfg.cap} puntos` : ''}.</p>
     <p><b>Ejemplo de Catan Universe:</b> A (1000), B (800) y C (1200) quedan 1º, 2º y 3º. A suma +2 contra B y +6 contra C, total <b>+8</b>. B resta −2 contra A y suma +7 contra C, total <b>+5</b>. C resta −6 y −7, total <b>−13</b>.</p>
+    <p><b>Socios e invitados.</b> Solo cuentan para el Elo las partidas donde hay mínimo ${MIN_SOCIOS} socios del club. Si en la mesa hay un invitado, queda registrado con su lugar, pero el Elo se calcula solo entre los socios, como si él no hubiera jugado. Un invitado puede hacerse socio después de ${GUEST_GAMES} partidas y empieza con ${c.base.toLocaleString('es-MX')} de Elo desde ese día.</p>
     <p class="muted" style="margin:0">Las partidas se reprocesan en orden de fecha cada vez que algo cambia, así que una partida atrasada o una corrección deja el ranking consistente.</p>
   </div>
   <div class="panel pad">
@@ -1006,8 +1133,8 @@ function vAdmin() {
     <div class="actions"><button type="button" class="btn" data-act="recheck">Ya me agregaron</button><button type="button" class="btn ghost" data-act="lock">Cerrar sesión</button></div></div>`;
   const c = S.data.cfg, ng = C.order.length;
   const prows = [...players()].sort((a,b) => a.name.localeCompare(b.name)).map(p => {
-    const n = (C.H[p.id] || []).length, conf = S.confirm === 'p:' + p.id;
-    return `<div class="arow"><span class="pname sp">${dot(p.id)}<b>${esc(p.name)}</b><span class="muted" style="font-size:13px">${n} partida${n===1?'':'s'}</span></span>
+    const n = C.P[p.id] || 0, conf = S.confirm === 'p:' + p.id;
+    return `<div class="arow"><span class="pname sp">${dot(p.id)}<b>${esc(p.name)}</b>${gtag(p.id)}<span class="muted" style="font-size:13px">${n} partida${n===1?'':'s'}</span></span>
       <button class="btn sm ghost" data-rename="${p.id}">Renombrar</button>
       ${n ? '' : conf ? `<span class="confirm">¿Eliminar?<button class="btn sm danger" data-delplayer="${p.id}">Eliminar</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn sm ghost" data-ask="p:${p.id}">Eliminar</button>`}</div>`;
   }).join('');
@@ -1090,7 +1217,7 @@ function render() {
 }
 function go(tab) {
   if (!TABS.includes(tab)) tab = 'ranking';
-  S.tab = tab; S.confirm = null; S.editName = false;
+  S.tab = tab; S.confirm = null; S.editName = false; S.inlineEdit = null;
   if (tab !== 'jugadores') S.sel = null;
   try { history.replaceState(null, '', '#' + tab); } catch (e) {}
   render(); window.scrollTo({ top: 0 });
@@ -1110,13 +1237,45 @@ document.addEventListener('click', async e => {
   if (S.busy) return;
   if (ds.tab) return go(ds.tab);
   if (ds.go) return go(ds.go);
-  if (ds.player) { S.sel = ds.player; S.editName = false; S.confirm = null; S.tab = 'jugadores'; try { history.replaceState(null,'','#jugadores'); } catch(_){} render(); window.scrollTo({ top: 0 }); return; }
+  if (ds.inline) { S.inlineEdit = ds.inline; render(); setTimeout(() => { const i = document.getElementById('i-name'); if (i) { i.focus(); i.select(); } }, 0); return; }
+  if (ds.player) { S.inlineEdit = null; S.sel = ds.player; S.editName = false; S.confirm = null; S.tab = 'jugadores'; try { history.replaceState(null,'','#jugadores'); } catch(_){} render(); window.scrollTo({ top: 0 }); return; }
   if (ds.rename) { S.sel = ds.rename; S.editName = true; S.confirm = null; S.tab = 'jugadores'; render(); window.scrollTo({ top: 0 }); setTimeout(() => document.getElementById('r-name')?.focus(), 0); return; }
   if (ds.pick) {
     const D = S.draft, i = D.picked.indexOf(ds.pick);
     if (i >= 0) { D.picked.splice(i, 1); delete D.color[ds.pick]; delete D.place[ds.pick]; delete D.vp[ds.pick]; }
-    else { D.picked.push(ds.pick); D.color[ds.pick] = ''; }
-    autoPlaces(); render(); return;
+    else { if (D.picked.length >= 6) return toast('Máximo 6 jugadores por partida.'); D.picked.push(ds.pick); D.color[ds.pick] = ''; }
+    const fromSearch = !!t.closest('#addres'), hadQ = !!fold(S.addq); if (fromSearch) S.addq = '';
+    const listTop = fromSearch && !hadQ ? document.querySelector('.plistbox')?.scrollTop : null;
+    autoPlaces(); render();
+    if (fromSearch && hadQ) { const q = document.getElementById('addq'); if (q) q.focus({ preventScroll: true }); }
+    if (listTop != null) { const lb = document.querySelector('.plistbox'); if (lb) lb.scrollTop = listTop; }
+    return;
+  }
+  if (ds.newp !== undefined) {
+    if (!isAdmin() || !S.draft) return;
+    const name = ds.newp.trim().slice(0, 40); if (!name) return;
+    if (players().some(p => fold(p.name) === fold(name))) return toast('Ya hay un jugador con ese nombre.');
+    if (S.draft.picked.length >= 6) return toast('Máximo 6 jugadores por partida.');
+    const nid = uid();
+    const asGuest = ds.ptype === 'invitado';
+    await commit(d => { d.players.push({ id: nid, name, createdAt: Date.now() }); if (asGuest) d.cfg.guest = { ...(d.cfg.guest || {}), [nid]: true }; },
+      { ok: asGuest ? `${name} quedó como invitado` : `${name} se unió como socio`, after: () => { S.addq = ''; if (S.draft && !S.draft.picked.includes(nid) && S.draft.picked.length < 6) { S.draft.picked.push(nid); S.draft.color[nid] = ''; autoPlaces(); } } });
+    return;
+  }
+  if (ds.mkmember) {
+    if (!isAdmin()) return;
+    const id = ds.mkmember, gp = C.GP[id] || 0;
+    if (gp < GUEST_GAMES && !ds.force) { S.confirm = 'm:' + id; render(); return; }
+    S.confirm = null;
+    const nm = playerById(id)?.name || 'El jugador';
+    await commit(d => { d.cfg.guest = { ...(d.cfg.guest || {}) }; delete d.cfg.guest[id]; d.cfg.joined = { ...(d.cfg.joined || {}), [id]: Date.now() }; }, { ok: `${nm} ya es socio. Empieza con ${S.data.cfg.base.toLocaleString('es-MX')} de Elo.`, tab: 'jugadores', sel: id });
+    return;
+  }
+  if (ds.mkguest) {
+    if (!isAdmin()) return;
+    const id = ds.mkguest; if ((C.H[id] || []).length) return toast('Ya tiene partidas que cuentan para el Elo.');
+    await commit(d => { d.cfg.guest = { ...(d.cfg.guest || {}), [id]: true }; if (d.cfg.joined) { d.cfg.joined = { ...d.cfg.joined }; delete d.cfg.joined[id]; } }, { ok: 'Ahora es invitado', tab: 'jugadores', sel: id });
+    return;
   }
   if (ds.pfor) { const D = S.draft; if (!D.picked.includes(ds.pfor)) return; D.place[ds.pfor] = +ds.pn; D.manual = true; syncPlaceUI(); refreshPreview(); return; }
   if (ds.cfor) { const D = S.draft; if (!D.picked.includes(ds.cfor)) return; D.color[ds.cfor] = ds.ck; render(); return; }
@@ -1153,7 +1312,8 @@ document.addEventListener('click', async e => {
   if (ds.delplayer) {
     if (!isAdmin()) return;
     const id = ds.delplayer; S.confirm = null;
-    await commit(d => { d.players = d.players.filter(p => p.id !== id); }, { ok: 'Jugador eliminado', tab: S.tab, sel: null });
+    if (C.P[id]) return toast('No se puede eliminar: aparece en partidas registradas.');
+    await commit(d => { d.players = d.players.filter(p => p.id !== id); if (d.cfg.guest) { d.cfg.guest = { ...d.cfg.guest }; delete d.cfg.guest[id]; } if (d.cfg.joined) { d.cfg.joined = { ...d.cfg.joined }; delete d.cfg.joined[id]; } }, { ok: 'Jugador eliminado', tab: S.tab, sel: null });
     return;
   }
   if (ds.editgame) {
@@ -1178,6 +1338,8 @@ document.addEventListener('click', async e => {
     case 'back': S.sel = null; S.editName = false; S.confirm = null; render(); break;
     case 'rename': S.editName = true; render(); setTimeout(() => document.getElementById('r-name')?.focus(), 0); break;
     case 'norename': S.editName = false; render(); break;
+    case 'noinline': S.inlineEdit = null; render(); break;
+    case 'addall': { S.addAll = !S.addAll; const box = document.getElementById('addres'); if (box) box.innerHTML = pickResults(); break; }
     case 'lock': await logout(); S.authMode = 'login'; if (S.draft && S.draft.id) S.draft = newDraft(); render(); toast('Cerraste sesión'); break;
     case 'am-login': S.authMode = 'login'; render(); break;
     case 'am-signup': S.authMode = 'signup'; render(); break;
@@ -1218,6 +1380,13 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeLb();
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr[data-player]')) { e.preventDefault(); e.target.click(); }
 });
+document.addEventListener('keydown', e => {
+  if (e.target && e.target.id === 'addq' && e.key === 'Enter') {
+    e.preventDefault();
+    const first = document.querySelector('#addres .pchip:not(.new)');
+    if (first && fold(S.addq)) first.click(); else if (!fold(S.addq)) e.target.blur();
+  }
+});
 document.addEventListener('input', e => {
   const t = e.target;
   if (!S.draft) return;
@@ -1229,6 +1398,7 @@ document.addEventListener('input', e => {
     const a = document.getElementById('autoplace'); if (a) a.hidden = false;
     refreshPreview();
   }
+  else if (t.dataset && t.dataset.addq) { S.addq = t.value; const box = document.getElementById('addres'); if (box) box.innerHTML = pickResults(); }
   else if (t.dataset && t.dataset.addp) {
     const id = t.value; if (!id || !playerById(id) || S.draft.picked.includes(id) || S.draft.picked.length >= 6) return;
     S.draft.picked.push(id); S.draft.color[id] = '';
@@ -1238,8 +1408,9 @@ document.addEventListener('input', e => {
   else if (t.dataset && t.dataset.csel) {
     const id = t.dataset.csel; if (!S.draft.picked.includes(id)) return;
     S.draft.color[id] = t.value;
-    render();
-    document.getElementById('co-' + id)?.focus();
+    t.blur();
+    const y = window.scrollY;
+    render(); window.scrollTo(0, y);
   }
   else if (t.id === 'g-date') { S.draft.date = t.value; refreshPreview(); }
   else if (t.id === 'g-notes') { S.draft.notes = t.value; }
@@ -1254,9 +1425,18 @@ document.addEventListener('submit', async e => {
     const taken = new Set(players().map(p => p.name.toLowerCase()));
     const fresh = names.filter(n => !taken.has(n.toLowerCase()));
     if (!fresh.length) return toast('Esos nombres ya están en la liga.');
-    const now = Date.now();
-    await commit(d => { fresh.forEach((name, i) => d.players.push({ id: uid(), name, createdAt: now + i })); },
-      { ok: fresh.length === 1 ? `${fresh[0]} se unió a la liga` : `${fresh.length} jugadores se unieron a la liga`, tab: 'jugadores', sel: null });
+    const now = Date.now(), asGuest = document.querySelector('input[name="ptype"]:checked')?.value === 'invitado';
+    await commit(d => { fresh.forEach((name, i) => { const id = uid(); d.players.push({ id, name, createdAt: now + i }); if (asGuest) d.cfg.guest = { ...(d.cfg.guest || {}), [id]: true }; }); },
+      { ok: fresh.length === 1 ? `${fresh[0]} ${asGuest ? 'quedó como invitado' : 'se unió como socio'}` : `${fresh.length} ${asGuest ? 'invitados agregados' : 'socios agregados'}`, tab: 'jugadores', sel: null });
+  } else if (f.id === 'iform') {
+    if (!isAdmin()) return;
+    const id = f.dataset.pid, name = val('i-name').trim().slice(0, 40), cur = playerById(id);
+    if (!cur) { S.inlineEdit = null; return render(); }
+    if (!name) return toast('Escribe un nombre.');
+    if (name === cur.name) { S.inlineEdit = null; return render(); }
+    if (players().some(p => p.id !== id && p.name.toLowerCase() === name.toLowerCase())) return toast('Ya hay un jugador con ese nombre.');
+    S.inlineEdit = null;
+    await commit(d => { const p = d.players.find(x => x.id === id); if (p) p.name = name; }, { ok: `Ahora se llama ${name}`, tab: 'jugadores', sel: null });
   } else if (f.id === 'rform') {
     if (!isAdmin()) return;
     const name = val('r-name').trim().slice(0, 40), id = S.sel;
