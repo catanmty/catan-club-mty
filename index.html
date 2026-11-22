@@ -237,6 +237,9 @@ input[type=text],input[type=date],input[type=number],input[type=password]{backgr
 .pchip:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 @media (hover:hover){.pchip:hover{border-color:var(--sea)}}
 .pchip.new{border-style:dashed;color:var(--sea);font-weight:500}
+.pchip.on{background:var(--sea);border-color:var(--sea);color:#fff}
+.pchip.on .gtag{background:#fff}
+.tpbox{max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px}
 .plist-tg{margin-top:8px;padding-left:0}
 .plistbox{margin-top:6px;max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 .plist-l{position:sticky;top:0;background:var(--bg);font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted);padding:3px 12px;border-bottom:1px solid var(--line)}
@@ -512,7 +515,7 @@ function champTitles() {
 const ORD = ['', 'Primer', 'Segundo', 'Tercer', 'Cuarto', 'Quinto', 'Sexto'];
 const MULTI = ['', '', 'Bicampeón', 'Tricampeón', 'Tetracampeón', 'Pentacampeón'];
 
-/* ===== Socios e invitados ===== */
+/* ===== Miembros e invitados ===== */
 const MIN_SOCIOS = 3, GUEST_GAMES = 3;
 const localDay = ms => { const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
 const isGuest = id => !!((S.data.cfg.guest || {})[id]);
@@ -760,7 +763,7 @@ function vRanking() {
   const legend = `<div class="panel pad rlegend"><p class="lbl" style="margin:0 0 8px">Rangos según tu Elo</p><div class="rgrid">${TIERS.map((t,i) => { const n = tcount[t[1]] || 0; const range = i === 0 ? `Menos de ${TIERS[1][0].toLocaleString('es-MX')}` : i === TIERS.length - 1 ? `${t[0].toLocaleString('es-MX')} o más` : `${t[0].toLocaleString('es-MX')} a ${(TIERS[i+1][0] - 1).toLocaleString('es-MX')}`;
     return `<div class="rbox ${n ? 'has' : ''}" style="--tc:${t[2]}"><svg class="hx" viewBox="0 0 24 24" style="fill:${t[2]}" aria-hidden="true">${HEX}</svg><div style="min-width:0"><b>${t[1]}</b><span class="rr">${range}</span>${n ? `<span class="rn">${n} jugador${n === 1 ? '' : 'es'}</span>` : ''}</div></div>`; }).join('')}</div></div>`;
   return head + pod + legend + `<div class="panel tbl-wrap"><table class="rk"><thead><tr class="grp"><th rowspan="2">#</th><th rowspan="2">Jugador</th><th rowspan="2" class="r">Elo</th><th rowspan="2" class="r">PJ</th><th colspan="4" class="pc pg">Lugares</th><th rowspan="2">Color</th><th rowspan="2" class="r wide">Última</th><th rowspan="2" class="r wide">Tendencia</th></tr><tr><th class="pc p1">1º</th><th class="pc">2º</th><th class="pc">3º</th><th class="pc p4">4º</th></tr></thead><tbody>${rows}</tbody></table></div>
-  <p class="hint">PJ: partidas jugadas que cuentan para el Elo. Lugares: cuántas veces quedó en 1º, 2º, 3º y 4º. Color: el que más ha usado. Solo aparecen socios del club${nGuests ? ` (hay ${nGuests} invitado${nGuests===1?'':'s'}, ver en Jugadores)` : ''}. Una partida cuenta si en la mesa hay mínimo ${MIN_SOCIOS} socios.</p>`;
+  <p class="hint">PJ: partidas jugadas que cuentan para el Elo. Lugares: cuántas veces quedó en 1º, 2º, 3º y 4º. Color: el que más ha usado. Solo aparecen miembros del club${nGuests ? ` (hay ${nGuests} invitado${nGuests===1?'':'s'}, ver en Jugadores)` : ''}. Una partida cuenta si en la mesa hay mínimo ${MIN_SOCIOS} miembros.</p>`;
 }
 function emptyState() {
   const ex = [['Ana',1087,'+14',9,4],['Luis',1032,'−6',9,2],['Marce',996,'+21',8,2],['Diego',941,'−18',8,1]];
@@ -871,7 +874,7 @@ function pickResults() {
   const shown = scored.slice(0, 12).map(x => x.p);
   const raw = String(S.addq || '').trim().replace(/\s+/g, ' ').slice(0, 40);
   const exact = players().some(p => fold(p.name) === q);
-  const create = isAdmin() && raw && !exact && !shown.length ? `<button type="button" class="pchip new" data-newp="${esc(raw)}" data-ptype="invitado">+ Agregar <b>${esc(raw)}</b> como invitado</button><button type="button" class="pchip new" data-newp="${esc(raw)}" data-ptype="socio">+ Agregar <b>${esc(raw)}</b> como socio</button>` : '';
+  const create = isAdmin() && raw && !exact && !shown.length ? `<button type="button" class="pchip new" data-newp="${esc(raw)}" data-ptype="invitado">+ Agregar <b>${esc(raw)}</b> como invitado</button><button type="button" class="pchip new" data-newp="${esc(raw)}" data-ptype="socio">+ Agregar <b>${esc(raw)}</b> como miembro</button>` : '';
   if (!shown.length) return `<p class="pres-t">No hay nadie con "${esc(raw)}".${isAdmin() ? '' : ' Pídele al admin que lo dé de alta.'}</p>${create ? `<div class="pchips">${create}</div>` : ''}`;
   return `<div class="pchips">${shown.map(btn).join('')}${create}</div>${scored.length > shown.length ? `<p class="pres-t">Hay ${scored.length - shown.length} más. Escribe más letras para encontrarlo.</p>` : ''}`;
 }
@@ -954,7 +957,7 @@ function previewHtml() {
   const games = S.data.games.filter(g => g.id !== S.draft.id).concat([data]);
   const c = compute(players(), games, S.data.cfg);
   const rows = c.G['__draft'] || [], k = c.CNT['__draft'] || { counts: true, socios: rows.length, guests: 0 };
-  const note = !k.counts ? `<div class="warn">Esta partida se guarda pero <b>no cuenta para el Elo</b>: hay ${k.socios} socio${k.socios===1?'':'s'} y se necesitan mínimo ${MIN_SOCIOS}.</div>` : k.guests ? `<p class="hint" style="margin:0 0 8px">Los invitados quedan registrados pero no suman ni restan Elo a nadie. El Elo se calcula solo entre los socios.</p>` : '';
+  const note = !k.counts ? `<div class="warn">Esta partida se guarda pero <b>no cuenta para el Elo</b>: hay ${k.socios} miembro${k.socios===1?'':'s'} y se necesitan mínimo ${MIN_SOCIOS}.</div>` : k.guests ? `<p class="hint" style="margin:0 0 8px">Los invitados quedan registrados pero no suman ni restan Elo a nadie. El Elo se calcula solo entre los miembros.</p>` : '';
   return `<p class="lbl">${k.counts ? 'Así cambiaría el Elo' : 'Resultado'}</p>${note}<div class="gl">${rows.map(r =>
     `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x ? '' : `${r0(r.pre)} → ${r0(r.post)}`}</span>`
   ).join('')}</div>`;
@@ -973,7 +976,7 @@ function vPartidas() {
     return `<article class="panel game ${S.flash===g.id?'fade':''}" id="game-${g.id}">
       <div class="ghead"><h3>Partida ${C.num[g.id]}</h3><span class="muted">${fmtDate(g.date)}</span>${g.notes ? `<span class="note">· ${esc(g.notes)}</span>` : ''}<span class="ga">${acts}</span></div>
       <div class="gl">${rows.map(r => `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x === 'guest' ? '' : r0(r.post)}</span>`).join('')}</div>
-      ${(k => !k ? '' : !k.counts ? `<p class="gnote">No cuenta para el Elo: ${k.socios} socio${k.socios===1?'':'s'} en la mesa, se necesitan mínimo ${MIN_SOCIOS}.</p>` : k.guests ? `<p class="gnote">Con invitado${k.guests===1?'':'s'}: el Elo se calculó solo entre los socios.</p>` : '')(C.CNT[g.id])}
+      ${(k => !k ? '' : !k.counts ? `<p class="gnote">No cuenta para el Elo: ${k.socios} miembro${k.socios===1?'':'s'} en la mesa, se necesitan mínimo ${MIN_SOCIOS}.</p>` : k.guests ? `<p class="gnote">Con invitado${k.guests===1?'':'s'}: el Elo se calculó solo entre los miembros.</p>` : '')(C.CNT[g.id])}
       ${isAssetId(g.photo) ? `<button type="button" class="gphoto" data-lb="${g.photo}" aria-label="Ver foto del tablero de la partida ${C.num[g.id]}"><img data-photo src="${blobUrl(g.photo)}" alt="Foto del tablero de la partida ${C.num[g.id]}" loading="lazy"></button>` : ''}
       ${C.CNT[g.id] && !C.CNT[g.id].counts ? '' : `<button class="btn sm ghost" style="margin-top:6px;padding-left:0" data-toggle="${g.id}" aria-expanded="${open}">${open ? 'Ocultar cálculo' : 'Ver cálculo'}</button>
       ${open ? duelsHtml(rows.filter(r => !r.x)) : ''}`}
@@ -992,14 +995,14 @@ function vJugadores() {
   if (S.sel && playerById(S.sel)) return vPlayer(S.sel);
   S.sel = null;
   const np = players().length, ng = players().filter(p => isGuest(p.id)).length;
-  const head = `<div class="sec-head"><div><h2>Jugadores</h2><p>${np ? `${np - ng} socio${np - ng === 1 ? '' : 's'}${ng ? ` y ${ng} invitado${ng === 1 ? '' : 's'}` : ''}. Toca a alguien para ver su histórico.${isAdmin() ? ' Usa el lápiz para cambiar un nombre.' : ''}` : `Cada jugador arranca con ${S.data.cfg.base.toLocaleString('es-MX')} de Elo.`}</p></div></div>`;
+  const head = `<div class="sec-head"><div><h2>Jugadores</h2><p>${np ? `${np - ng} miembro${np - ng === 1 ? '' : 's'}${ng ? ` y ${ng} invitado${ng === 1 ? '' : 's'}` : ''}. Toca a alguien para ver su histórico.${isAdmin() ? ' Usa el lápiz para cambiar un nombre.' : ''}` : `Cada jugador arranca con ${S.data.cfg.base.toLocaleString('es-MX')} de Elo.`}</p></div></div>`;
   const add = !isAdmin() ? `<p class="hint" style="margin:-6px 0 14px">Para agregar jugadores, entra como admin en la pestaña Admin.</p>` : `<form id="pform" class="panel pad" autocomplete="off" style="margin-bottom:14px"><div class="addp"><input type="text" id="p-name" placeholder="Nombre del jugador" maxlength="200" aria-label="Nombres de jugadores"><button class="btn primary" type="submit">Agregar</button></div>
-    <div class="seg" role="radiogroup" aria-label="Tipo de jugador"><label><input type="radio" name="ptype" value="socio" checked><span><b>Socio</b> del club, sale en el ranking</span></label><label><input type="radio" name="ptype" value="invitado"><span><b>Invitado</b>, no cuenta para el Elo</span></label></div>
-    <p class="hint">Para agregar varios a la vez, sepáralos con comas: Ana, Luis, Marce. Un invitado puede hacerse socio después de ${GUEST_GAMES} partidas.</p></form>`;
+    <div class="seg" role="radiogroup" aria-label="Tipo de jugador"><label><input type="radio" name="ptype" value="socio" checked><span><b>Miembro</b> del club, sale en el ranking</span></label><label><input type="radio" name="ptype" value="invitado"><span><b>Invitado</b>, no cuenta para el Elo</span></label></div>
+    <p class="hint">Para agregar varios a la vez, sepáralos con comas: Ana, Luis, Marce. Un invitado puede hacerse miembro después de ${GUEST_GAMES} partidas.</p></form>`;
   const list = players().map(p => ({ p, s: playerStats(p.id), g: isGuest(p.id) })).sort((a,b) => (a.g - b.g) || (a.g ? (C.GP[b.p.id] || 0) - (C.GP[a.p.id] || 0) : b.s.elo - a.s.elo) || a.p.name.localeCompare(b.p.name));
   const adm = isAdmin();
   const card = x => { const gp = C.GP[x.p.id] || 0; return x.g
-    ? `<button class="pcard guest" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta"><span class="gtag">Invitado</span> ${gp >= GUEST_GAMES ? '<b class="ready">Listo para ser socio</b>' : `${gp} de ${GUEST_GAMES} partidas`}</span></span><span class="el muted">—</span></button>`
+    ? `<button class="pcard guest" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta"><span class="gtag">Invitado</span> ${gp >= GUEST_GAMES ? '<b class="ready">Listo para ser miembro</b>' : `${gp} de ${GUEST_GAMES} partidas`}</span></span><span class="el muted">—</span></button>`
     : `<button class="pcard" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta">${x.s.n} partida${x.s.n===1?'':'s'} · ${x.s.wins} victoria${x.s.wins===1?'':'s'}</span></span><span class="el">${r0(x.s.elo)}</span></button>`; };
   const item = x => !adm ? card(x) : S.inlineEdit === x.p.id
     ? `<form class="pcard pinline" id="iform" data-pid="${x.p.id}" autocomplete="off"><input type="text" id="i-name" value="${esc(x.p.name)}" maxlength="40" aria-label="Nuevo nombre de ${esc(x.p.name)}"><span class="pinline-btns"><button class="btn primary sm" type="submit">Guardar</button><button class="btn sm" type="button" data-act="noinline">Cancelar</button></span></form>`
@@ -1011,15 +1014,15 @@ function memberBtns(id) {
   if (!isAdmin()) return '';
   if (isGuest(id)) {
     const gp = C.GP[id] || 0;
-    if (S.confirm === 'm:' + id) return `<span class="confirm">Lleva ${gp} de ${GUEST_GAMES} partidas. ¿Hacerlo socio de todos modos?<button class="btn sm primary" data-mkmember="${id}" data-force="1">Sí, hacer socio</button><button class="btn sm" data-act="noconfirm">No</button></span>`;
-    return `<button class="btn sm ${gp >= GUEST_GAMES ? 'primary' : 'ghost'}" data-mkmember="${id}">Hacer socio</button>`;
+    if (S.confirm === 'm:' + id) return `<span class="confirm">Lleva ${gp} de ${GUEST_GAMES} partidas. ¿Hacerlo miembro de todos modos?<button class="btn sm primary" data-mkmember="${id}" data-force="1">Sí, hacer miembro</button><button class="btn sm" data-act="noconfirm">No</button></span>`;
+    return `<button class="btn sm ${gp >= GUEST_GAMES ? 'primary' : 'ghost'}" data-mkmember="${id}">Hacer miembro</button>`;
   }
   return (C.H[id] || []).length ? '' : `<button class="btn sm ghost" data-mkguest="${id}">Cambiar a invitado</button>`;
 }
 function guestPanel(id) {
   const gp = C.GP[id] || 0, j = (S.data.cfg.joined || {})[id];
-  if (!isGuest(id)) return j ? `<p class="hint" style="margin:8px 0 0">Socio desde el ${fmtDate(localDay(j))}. Sus partidas cuentan para el Elo a partir de esa fecha.</p>` : '';
-  return `<div class="notice" style="margin-top:14px"><span><b>Invitado.</b> Ha jugado ${gp} de ${GUEST_GAMES} partidas para poder hacerse socio. Sus partidas quedan registradas pero no suman ni restan Elo a nadie y no aparece en el ranking. ${gp >= GUEST_GAMES ? 'Ya cumple las partidas: un admin puede hacerlo socio.' : ''}</span></div>`;
+  if (!isGuest(id)) return j ? `<p class="hint" style="margin:8px 0 0">Miembro desde el ${fmtDate(localDay(j))}. Sus partidas cuentan para el Elo a partir de esa fecha.</p>` : '';
+  return `<div class="notice" style="margin-top:14px"><span><b>Invitado.</b> Ha jugado ${gp} de ${GUEST_GAMES} partidas para poder hacerse miembro. Sus partidas quedan registradas pero no suman ni restan Elo a nadie y no aparece en el ranking. ${gp >= GUEST_GAMES ? 'Ya cumple las partidas: un admin puede hacerlo miembro.' : ''}</span></div>`;
 }
 function vPlayer(id) {
   const p = playerById(id), s = playerStats(id), cfg = S.data.cfg;
@@ -1254,14 +1257,32 @@ function tFormatHtml(t, adm) {
     <div class="frow" style="margin-top:8px"><label class="f">Pasan por mesa de semifinal<input type="number" id="tf-sper" min="1" max="4" value="${f.semiPerTable}"></label></div>
     <div class="actions" style="margin-top:12px"><button class="btn primary sm" type="submit">Guardar formato</button><button class="btn sm" type="button" data-act="tfmtcancel">Cancelar</button></div></form>`;
 }
+function tpResults(t) {
+  if (!t) return '';
+  const ps = new Set(tParts(t)), sel = S.tpSel || (S.tpSel = new Set());
+  [...sel].forEach(id => { if (ps.has(id) || !playerById(id)) sel.delete(id); });
+  const left = players().filter(p => !ps.has(p.id)).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  const q = fold(S.tpq), words = q.split(/\s+/).filter(Boolean);
+  const chip = p => `<button type="button" class="pchip ${sel.has(p.id) ? 'on' : ''}" data-tpsel="${p.id}" aria-pressed="${sel.has(p.id)}">${sel.has(p.id) ? '✓ ' : ''}${esc(p.name)}${gtag(p.id, 'sm')}</button>`;
+  let body;
+  if (q) {
+    const hit = left.filter(p => words.every(w => fold(p.name).includes(w)));
+    const raw = String(S.tpq || '').trim().replace(/\s+/g, ' ').slice(0, 40), exact = players().some(p => fold(p.name) === q);
+    const create = !hit.length && raw && !exact ? `<div class="pchips" style="margin-top:6px"><button type="button" class="pchip new" data-tpnew="invitado" data-tpname="${esc(raw)}">+ Agregar <b>${esc(raw)}</b> como invitado</button><button type="button" class="pchip new" data-tpnew="socio" data-tpname="${esc(raw)}">+ Agregar <b>${esc(raw)}</b> como miembro</button></div>` : '';
+    body = hit.length ? `<div class="pchips">${hit.slice(0, 40).map(chip).join('')}</div>` : `<p class="pres-t">${exact ? 'Ya está en el torneo.' : `No hay nadie con "${esc(raw)}" en la liga.`}</p>${create}`;
+  } else if (!left.length) body = `<p class="pres-t">Ya están todos los jugadores de la liga.</p>`;
+  else body = `<p class="pres-t">Toca a los jugadores de la liga para seleccionarlos, o escribe para buscar.</p><div class="pchips tpbox">${left.map(chip).join('')}</div>`;
+  const nm = left.filter(p => !isGuest(p.id) && !sel.has(p.id)).length;
+  return body + `<div class="tacts" style="margin-top:8px">${sel.size ? `<button type="button" class="btn sm primary" data-act="tpadd">Agregar seleccionados (${sel.size})</button><button type="button" class="btn sm ghost" data-act="tpclear">Quitar selección</button>` : ''}${!q && nm ? `<button type="button" class="btn sm ghost" data-act="tpallm">Seleccionar a todos los miembros (${nm})</button>` : ''}</div>`;
+}
 function tPartsHtml(t, adm) {
   const ps = tParts(t), inTable = new Set(tPhases(t).flatMap(p => tTables(t, p.key).flatMap(x => x.p)));
   const list = ps.length ? `<div class="tparts">${ps.map(id => `<span class="tpart">${pname(id)}${gtag(id, 'sm')}${adm && !inTable.has(id) ? `<button type="button" class="tpx" data-tprm="${id}" aria-label="Quitar a ${pname(id)}">×</button>` : ''}</span>`).join('')}</div>` : '<p class="muted" style="margin:0">Aún no hay participantes.</p>';
   if (!adm) return `<div class="panel pad" style="margin-bottom:12px"><p class="lbl" style="margin:0 0 6px">Participantes (${ps.length})</p>${list}</div>`;
-  const opts = [...players()].filter(p => !ps.includes(p.id)).sort((a, b) => a.name.localeCompare(b.name, 'es')).map(p => `<option value="${esc(p.name)}"></option>`).join('');
-  const pend = S.tpNew && S.tpNew.length ? `<div class="notice" style="margin-top:10px;flex-direction:column"><span>${S.tpNew.map(n => `<b>${esc(n)}</b>`).join(', ')} no ${S.tpNew.length === 1 ? 'está' : 'están'} en la liga. ¿Cómo ${S.tpNew.length === 1 ? 'lo' : 'los'} agrego?</span><div class="tacts" style="margin-top:6px"><button class="btn sm primary" data-tpnew="invitado">Como invitado${S.tpNew.length === 1 ? '' : 's'}</button><button class="btn sm" data-tpnew="socio">Como socio${S.tpNew.length === 1 ? '' : 's'}</button><button class="btn sm ghost" data-act="tpnewcancel">Cancelar</button></div></div>` : '';
   return `<div class="panel pad" style="margin-bottom:12px"><p class="lbl" style="margin:0 0 6px">Participantes (${ps.length})</p>${list}
-    <form id="tpform" class="addp" autocomplete="off" style="margin-top:10px"><input type="text" id="tp-name" list="tp-list" placeholder="Nombre, o varios separados por comas" aria-label="Agregar participantes"><datalist id="tp-list">${opts}</datalist><button class="btn primary" type="submit">Agregar</button></form>${pend}</div>`;
+    <p class="lbl" style="margin:14px 0 6px">Agregar participantes</p>
+    <div class="psearch"><input type="search" id="tpq" placeholder="Busca por nombre o apellido" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Buscar jugador para el torneo" value="${esc(S.tpq || '')}"></div>
+    <div id="tpres" class="pres">${tpResults(t)}</div></div>`;
 }
 function vTorneo(t) {
   const adm = isAdmin(), prizes = String(t.prizes || '').split('\n').map(x => x.trim()).filter(Boolean), wp = tWinnerP(t);
@@ -1279,7 +1300,7 @@ function vTorneo(t) {
     if (last && ph.group === 'qual') body += tAdvHtml(t, 'qual', adm);
     if (last && ph.group === 'semi') body += tAdvHtml(t, 'semi', adm);
   });
-  return head + form + tFormatHtml(t, adm) + tPartsHtml(t, adm) + body + `<p class="hint" style="margin-top:14px">Cada mesa capturada es una partida normal de la liga: cuenta para el Elo si en la mesa hay mínimo ${MIN_SOCIOS} socios.</p>`;
+  return head + form + tFormatHtml(t, adm) + tPartsHtml(t, adm) + body + `<p class="hint" style="margin-top:14px">Cada mesa capturada es una partida normal de la liga: cuenta para el Elo si en la mesa hay mínimo ${MIN_SOCIOS} miembros.</p>`;
 }
 function ttSync() {
   if (!S.tTabsDraft) return;
@@ -1345,7 +1366,7 @@ function vFormula() {
     <div class="formula" style="margin-top:8px">ajuste = K × (W − E)${S.data.cfg.perRival ? '   (redondeado)' : ''}</div>
     <p style="margin-top:12px">W vale 1 si quedaste arriba de ese rival, 0.5 si empataron y 0 si quedaste abajo. Se suman los ajustes contra todos tus rivales y ese es tu cambio de Elo de la partida${S.data.cfg.cap > 0 ? `, con un tope de ±${S.data.cfg.cap} puntos` : ''}.</p>
     <p><b>Ejemplo de Catan Universe:</b> A (1000), B (800) y C (1200) quedan 1º, 2º y 3º. A suma +2 contra B y +6 contra C, total <b>+8</b>. B resta −2 contra A y suma +7 contra C, total <b>+5</b>. C resta −6 y −7, total <b>−13</b>.</p>
-    <p><b>Socios e invitados.</b> Solo cuentan para el Elo las partidas donde hay mínimo ${MIN_SOCIOS} socios del club. Si en la mesa hay un invitado, queda registrado con su lugar, pero el Elo se calcula solo entre los socios, como si él no hubiera jugado. Un invitado puede hacerse socio después de ${GUEST_GAMES} partidas y empieza con ${c.base.toLocaleString('es-MX')} de Elo desde ese día.</p>
+    <p><b>Miembros e invitados.</b> Solo cuentan para el Elo las partidas donde hay mínimo ${MIN_SOCIOS} miembros del club. Si en la mesa hay un invitado, queda registrado con su lugar, pero el Elo se calcula solo entre los miembros, como si él no hubiera jugado. Un invitado puede hacerse miembro después de ${GUEST_GAMES} partidas y empieza con ${c.base.toLocaleString('es-MX')} de Elo desde ese día.</p>
     <p class="muted" style="margin:0">Las partidas se reprocesan en orden de fecha cada vez que algo cambia, así que una partida atrasada o una corrección deja el ranking consistente.</p>
   </div>
   <div class="panel pad">
@@ -1468,7 +1489,7 @@ function render() {
 }
 function go(tab) {
   if (!TABS.includes(tab)) tab = 'ranking';
-  S.tab = tab; S.confirm = null; S.editName = false; S.inlineEdit = null; S.tSel = null; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null;
+  S.tab = tab; S.confirm = null; S.editName = false; S.inlineEdit = null; S.tSel = null; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null; S.tpSel = null; S.tpq = '';
   if (tab !== 'jugadores') S.sel = null;
   try { history.replaceState(null, '', '#' + tab); } catch (e) {}
   render(); window.scrollTo({ top: 0 });
@@ -1510,7 +1531,7 @@ document.addEventListener('click', async e => {
     const nid = uid();
     const asGuest = ds.ptype === 'invitado';
     await commit(d => { d.players.push({ id: nid, name, createdAt: Date.now() }); if (asGuest) d.cfg.guest = { ...(d.cfg.guest || {}), [nid]: true }; },
-      { ok: asGuest ? `${name} quedó como invitado` : `${name} se unió como socio`, after: () => { S.addq = ''; if (S.draft && !S.draft.picked.includes(nid) && S.draft.picked.length < 6) { S.draft.picked.push(nid); S.draft.color[nid] = ''; autoPlaces(); } } });
+      { ok: asGuest ? `${name} quedó como invitado` : `${name} se unió como miembro`, after: () => { S.addq = ''; if (S.draft && !S.draft.picked.includes(nid) && S.draft.picked.length < 6) { S.draft.picked.push(nid); S.draft.color[nid] = ''; autoPlaces(); } } });
     return;
   }
   if (ds.mkmember) {
@@ -1519,7 +1540,7 @@ document.addEventListener('click', async e => {
     if (gp < GUEST_GAMES && !ds.force) { S.confirm = 'm:' + id; render(); return; }
     S.confirm = null;
     const nm = playerById(id)?.name || 'El jugador';
-    await commit(d => { d.cfg.guest = { ...(d.cfg.guest || {}) }; delete d.cfg.guest[id]; d.cfg.joined = { ...(d.cfg.joined || {}), [id]: Date.now() }; }, { ok: `${nm} ya es socio. Empieza con ${S.data.cfg.base.toLocaleString('es-MX')} de Elo.`, tab: 'jugadores', sel: id });
+    await commit(d => { d.cfg.guest = { ...(d.cfg.guest || {}) }; delete d.cfg.guest[id]; d.cfg.joined = { ...(d.cfg.joined || {}), [id]: Date.now() }; }, { ok: `${nm} ya es miembro. Empieza con ${S.data.cfg.base.toLocaleString('es-MX')} de Elo.`, tab: 'jugadores', sel: id });
     return;
   }
   if (ds.mkguest) {
@@ -1553,7 +1574,7 @@ document.addEventListener('click', async e => {
     catch (err) { toast('No se pudo quitar. Revisa que hayas corrido el texto de admins en Supabase.'); }
     S.busy = false; render(); return;
   }
-  if (ds.tview) { S.tSel = ds.tview; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null; S.confirm = null; S.tForm = false; render(); window.scrollTo({ top: 0 }); return; }
+  if (ds.tview) { S.tpSel = null; S.tpq = ''; S.tSel = ds.tview; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null; S.confirm = null; S.tForm = false; render(); window.scrollTo({ top: 0 }); return; }
   if (ds.tgen && isAdmin()) {
     const t = tById(S.tSel), key = ds.tgen; if (!t) return;
     const pool = tPool(t, key);
@@ -1578,8 +1599,10 @@ document.addEventListener('click', async e => {
     delAssets([ph]); return;
   }
   if (ds.tadv && isAdmin()) { S.tAdvEdit = ds.tadv; render(); return; }
+  if (ds.tpsel) { const sel = S.tpSel || (S.tpSel = new Set()); sel.has(ds.tpsel) ? sel.delete(ds.tpsel) : sel.add(ds.tpsel); const box = document.getElementById('tpres'); if (box) box.innerHTML = tpResults(tById(S.tSel)); return; }
   if (ds.tpnew && isAdmin()) {
-    const names = S.tpNew || [], asGuest = ds.tpnew === 'invitado', now = Date.now(), ids = names.map(() => uid());
+    if (ds.tpname) S.tpq = '';
+    const names = ds.tpname ? [ds.tpname] : (S.tpNew || []), asGuest = ds.tpnew === 'invitado', now = Date.now(), ids = names.map(() => uid());
     S.tpNew = null;
     await tSave((t, d) => { names.forEach((name, j) => { if (d.players.some(p => fold(p.name) === fold(name))) return; d.players.push({ id: ids[j], name, createdAt: now + j }); if (asGuest) d.cfg.guest = { ...(d.cfg.guest || {}), [ids[j]]: true }; t.participants = [...new Set([...(t.participants || []), ids[j]])]; }); }, names.length === 1 ? `${names[0]} se agregó al torneo` : `${names.length} jugadores agregados al torneo`);
     return;
@@ -1631,7 +1654,7 @@ document.addEventListener('click', async e => {
     case 'newshare': S.shareOut = null; S.draft = newDraft(); render(); window.scrollTo({ top: 0 }); break;
     case 'rmimpphoto': if (IMP.url) URL.revokeObjectURL(IMP.url); IMP = { blob: null, url: null }; refreshImpPhoto(); break;
     case 'rmchphoto': chReset(); refreshChPhoto(); break;
-    case 'tback': S.tSel = null; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null; S.tForm = false; render(); window.scrollTo({ top: 0 }); break;
+    case 'tback': S.tSel = null; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null; S.tpSel = null; S.tpq = ''; S.tForm = false; render(); window.scrollTo({ top: 0 }); break;
     case 'ttadd': ttSync(); (S.tTabsDraft ||= []).push({ p: [], g: null }); render(); break;
     case 'ttcancel': S.tEditKey = null; S.tTabsDraft = null; render(); break;
     case 'tadvcancel': S.tAdvEdit = null; render(); break;
@@ -1639,6 +1662,9 @@ document.addEventListener('click', async e => {
     case 'tfmtedit': S.tFmtEdit = true; render(); break;
     case 'tfmtcancel': S.tFmtEdit = false; render(); break;
     case 'tpnewcancel': S.tpNew = null; render(); break;
+    case 'tpclear': S.tpSel = new Set(); { const box = document.getElementById('tpres'); if (box) box.innerHTML = tpResults(tById(S.tSel)); } break;
+    case 'tpallm': { const t = tById(S.tSel); if (!t) break; const ps = new Set(tParts(t)); const sel = S.tpSel || (S.tpSel = new Set()); players().forEach(p => { if (!ps.has(p.id) && !isGuest(p.id)) sel.add(p.id); }); const box = document.getElementById('tpres'); if (box) box.innerHTML = tpResults(t); break; }
+    case 'tpadd': { const ids = [...(S.tpSel || [])].filter(id => playerById(id)); if (!ids.length) break; S.tpSel = new Set(); S.tpq = ''; await tSave(t => { t.participants = [...new Set([...(t.participants || []), ...ids])]; }, `${ids.length} participante${ids.length === 1 ? '' : 's'} agregado${ids.length === 1 ? '' : 's'}`); break; }
     case 'tnew': chReset(); S.tForm = true; S.tEdit = null; render(); setTimeout(() => document.getElementById('tform')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 0); break;
     case 'tcancel': chReset(); S.tForm = false; S.tEdit = null; render(); break;
     case 'rmphoto': if (S.draft) { if (S.draft.pUrl) URL.revokeObjectURL(S.draft.pUrl); S.draft.pBlob = null; S.draft.pUrl = null; S.draft.photo = null; refreshPhoto(); } break;
@@ -1689,6 +1715,7 @@ document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr[data-player]')) { e.preventDefault(); e.target.click(); }
 });
 document.addEventListener('keydown', e => {
+  if (e.target && e.target.id === 'tpq' && e.key === 'Enter') { e.preventDefault(); const first = document.querySelector('#tpres .pchip[data-tpsel]'); if (first && fold(S.tpq)) first.click(); return; }
   if (e.target && e.target.id === 'addq' && e.key === 'Enter') {
     e.preventDefault();
     const first = document.querySelector('#addres .pchip:not(.new)');
@@ -1697,6 +1724,7 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('input', e => {
   const t = e.target;
+  if (t.id === 'tpq') { S.tpq = t.value; const box = document.getElementById('tpres'); if (box) box.innerHTML = tpResults(tById(S.tSel)); return; }
   if (!S.draft) return;
   if (t.dataset && t.dataset.vpin) { S.draft.vp[t.dataset.vpin] = t.value; autoPlaces(); syncPlaceUI(); refreshPreview(); }
   else if (t.dataset && t.dataset.psel) {
@@ -1735,7 +1763,7 @@ document.addEventListener('submit', async e => {
     if (!fresh.length) return toast('Esos nombres ya están en la liga.');
     const now = Date.now(), asGuest = document.querySelector('input[name="ptype"]:checked')?.value === 'invitado';
     await commit(d => { fresh.forEach((name, i) => { const id = uid(); d.players.push({ id, name, createdAt: now + i }); if (asGuest) d.cfg.guest = { ...(d.cfg.guest || {}), [id]: true }; }); },
-      { ok: fresh.length === 1 ? `${fresh[0]} ${asGuest ? 'quedó como invitado' : 'se unió como socio'}` : `${fresh.length} ${asGuest ? 'invitados agregados' : 'socios agregados'}`, tab: 'jugadores', sel: null });
+      { ok: fresh.length === 1 ? `${fresh[0]} ${asGuest ? 'quedó como invitado' : 'se unió como miembro'}` : `${fresh.length} ${asGuest ? 'invitados agregados' : 'miembros agregados'}`, tab: 'jugadores', sel: null });
   } else if (f.id === 'iform') {
     if (!isAdmin()) return;
     const id = f.dataset.pid, name = val('i-name').trim().slice(0, 40), cur = playerById(id);
