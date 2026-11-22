@@ -1,0 +1,71 @@
+name: Respaldo automatico
+on:
+  schedule:
+    - cron: '41 8 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: respaldo
+jobs:
+  respaldo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bajar el repositorio
+        uses: actions/checkout@v4
+      - name: Copiar la liga desde Supabase
+        env:
+          SB_URL: https://ebxxtelbqydbwpnfmhmx.supabase.co
+          SB_KEY: sb_publishable_3aQ3G8PdcPZSy-lXz-BdSQ_rJq5dL-5
+        run: |
+          node - <<'EOF'
+          const fs = require('fs');
+          const SB = process.env.SB_URL, K = process.env.SB_KEY;
+          const DEF = { base: 1000, k: 8, kProv: 8, provGames: 0, cap: 0, perRival: true };
+          async function get(path) {
+            const out = []; let off = 0;
+            for (;;) {
+              const r = await fetch(SB + path + '&limit=1000&offset=' + off, { headers: { apikey: K } });
+              if (!r.ok) throw new Error(path + ' respondio ' + r.status + ' ' + (await r.text()));
+              const page = await r.json(); out.push(...page);
+              if (page.length < 1000) return out; off += 1000;
+            }
+          }
+          (async () => {
+            const [st, pl, gm, ch] = await Promise.all([
+              get('/rest/v1/settings?select=cfg&id=eq.1'),
+              get('/rest/v1/players?select=*&order=created_at'),
+              get('/rest/v1/games?select=*&order=created_at'),
+              get('/rest/v1/champions?select=*&order=year')
+            ]);
+            const cfg = { ...DEF, ...((st[0] && st[0].cfg) || {}) };
+            delete cfg.log;
+            const datos = {
+              v: 1, admin: null, cfg,
+              players: pl.map(p => ({ id: p.id, name: p.name, createdAt: Date.parse(p.created_at) })),
+              games: gm.map(g => ({ id: g.id, date: g.date, notes: g.notes || '', results: g.results || [], photo: g.photo || null, createdAt: Date.parse(g.created_at) })),
+              champions: ch.map(c => ({ id: c.id, year: c.year, name: c.name, alias: c.alias || '', photo: c.photo || null }))
+            };
+            fs.mkdirSync('respaldos', { recursive: true });
+            let prev = null;
+            try { prev = JSON.parse(fs.readFileSync('respaldos/ultimo.json', 'utf8')); } catch (e) {}
+            if (prev && JSON.stringify(prev.datos) === JSON.stringify(datos)) { console.log('Sin cambios desde el ultimo respaldo.'); return; }
+            if (prev && prev.datos && prev.datos.games.length && !datos.games.length && !datos.players.length) throw new Error('Supabase regreso la liga vacia. No se guarda para no tapar el respaldo bueno.');
+            const fecha = new Date().toISOString();
+            const dia = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Monterrey' });
+            const txt = JSON.stringify({ liga: 'Catan Club MTY', fecha, automatico: true, datos });
+            fs.writeFileSync('respaldos/ultimo.json', txt);
+            fs.writeFileSync('respaldos/respaldo-' + dia + '.json', txt);
+            const viejos = fs.readdirSync('respaldos').filter(f => /^respaldo-\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort().reverse().slice(60);
+            viejos.forEach(f => fs.unlinkSync('respaldos/' + f));
+            console.log('Respaldo guardado: ' + datos.players.length + ' jugadores, ' + datos.games.length + ' partidas.');
+          })().catch(e => { console.error(e.message); process.exit(1); });
+          EOF
+      - name: Guardar en GitHub
+        run: |
+          git config user.name "respaldo-automatico"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add respaldos
+          if git diff --cached --quiet; then echo "Nada que guardar."; exit 0; fi
+          git commit -m "Respaldo automatico de la liga"
+          git pull --rebase
+          git push
