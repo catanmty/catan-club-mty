@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Liga Elo Catan Club MTY</title>
-<meta name="description" content="Ranking Elo, partidas, jugadores y campeones del Catan Club MTY.">
+<meta name="description" content="Ranking Elo, partidas, jugadores y torneos del Catan Club MTY.">
 <meta property="og:title" content="Liga Elo Catan Club MTY">
-<meta property="og:description" content="Ranking Elo, partidas, jugadores y campeones del Catan Club MTY.">
+<meta property="og:description" content="Ranking Elo, partidas, jugadores y torneos del Catan Club MTY.">
 <meta property="og:image" content="logo.png">
 <meta name="theme-color" content="#B8232F">
 <link rel="icon" type="image/png" href="logo.png">
@@ -332,6 +332,49 @@ input[type=text],input[type=date],input[type=number],input[type=password]{backgr
 .prose li{margin-bottom:6px}
 .tiers{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}
 .rlegend{margin-bottom:14px}
+.tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:16px}
+@media (max-width:420px){.tlist{grid-template-columns:minmax(0,1fr)}}
+.tcard{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.tcard.upcoming{border-style:dashed}
+.tph{display:block;border:0;padding:0;margin:0;background:var(--bg);cursor:zoom-in;width:100%}
+.tph img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.tbd{padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.thead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.thead h3{margin:0;font-size:18px}
+.twin{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.twin b{font-size:16px}
+.twin .crown-tag{margin-top:0}
+.tsoon{font-size:13px;font-weight:700;color:var(--muted)}
+.tdesc{margin:0;font-size:14px;color:var(--ink)}
+.tprz ul{margin:0;padding-left:18px;font-size:14px}
+.tprz li{margin:1px 0}
+.tacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.tyear{margin-top:6px}
+.tprog{margin:0;font-size:13px;color:var(--muted)}
+.tphase{margin:6px 0 14px}
+.tphase h3{font-size:17px;margin:0 0 8px}
+.ttables{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-bottom:8px}
+.ttable{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.ttable.done{background:var(--surface-2)}
+.tth{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px}
+.tth .muted{font-size:12.5px}
+.tseats{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-size:14.5px}
+.tseats li{display:flex;align-items:center;gap:6px}
+.tgl{grid-template-columns:24px minmax(0,1fr) auto auto;font-size:14px}
+.ttedit .ttable select{width:100%}
+.tst td,.tst th{white-space:nowrap}
+.tst tr.adv td{background:color-mix(in srgb,var(--wheat) 22%,transparent)}
+.advtag{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--sea);margin-left:4px}
+.tadv{margin-bottom:14px}
+.tchecks{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px 12px}
+.tchecks label,.tcheck{display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer}
+.tchecks input,.tcheck input{width:18px;height:18px;accent-color:var(--sea);margin:0}
+.tparts{display:flex;flex-wrap:wrap;gap:6px}
+.tpart{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13.5px;font-weight:600}
+.tpx{border:0;background:none;color:var(--muted);font-size:17px;line-height:1;cursor:pointer;padding:0 0 0 2px}
+.tfmt{margin:0 0 12px;color:var(--muted);font-size:14px}
+.tform textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit;font-weight:500;color:var(--ink);resize:vertical;min-height:70px}
+.tform{margin-bottom:14px;border-color:var(--sea)}
 .gtag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#6B4E16;background:#F3E3B8;border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle;white-space:nowrap;line-height:1.5}
 .gtag.sm{font-size:10px;padding:0 5px}
 .gtag.lg{font-size:12px;padding:2px 8px;margin-left:0}
@@ -384,7 +427,7 @@ const SHELL = `<header class="top"><div class="wrap">
     <button class="tab" data-tab="partida" hidden>Registrar partida</button>
     <button class="tab" data-tab="partidas">Partidas</button>
     <button class="tab" data-tab="jugadores">Jugadores</button>
-    <button class="tab" data-tab="campeones">Campeones</button>
+    <button class="tab" data-tab="campeones">Torneos</button>
     <button class="tab" data-tab="formula">Cómo se calcula</button>
     <button class="tab" data-tab="admin" hidden>${LOCK}Admin</button>
   </nav>
@@ -629,6 +672,9 @@ async function writeDel(t, d) {
 async function commit(mut, opts = {}) {
   if (!isAdmin()) { toast('Entra como admin en la pestaña Admin para hacer cambios.'); return false; }
   if (S.busy) return false;
+  S.busy = true;
+  try { const st = await api('/rest/v1/settings?select=cfg&id=eq.1'); if (st && st[0] && st[0].cfg) S.data.cfg = { ...DEF, ...st[0].cfg }; } catch (e) {}
+  S.busy = false;
   const next = JSON.parse(JSON.stringify(S.data)); mut(next);
   const dp = diffRows(S.data.players, next.players, ROW.players), dg = diffRows(S.data.games, next.games, ROW.games), dc = diffRows(S.data.champions || [], next.champions || [], ROW.champions);
   S.busy = true; toast('Guardando…', true);
@@ -754,12 +800,13 @@ function impPicker() {
     : `<div class="photo-pick">${input}<label class="btn" for="imp-photo">Agregar foto del tablero</label><span class="hint" style="margin:0">Opcional. Elige la que te mandaron por WhatsApp.</span></div>`;
 }
 const refreshImpPhoto = () => { document.querySelectorAll('.impphotobox').forEach(el => el.innerHTML = impPicker()); };
-let CH = { blob: null, url: null };
+let CH = { blob: null, url: null, existing: null };
 function champPicker() {
   const input = `<input type="file" id="ch-photo" class="vh" accept="image/*">`;
-  return CH.url ? `<div class="photo-pick"><img src="${esc(CH.url)}" alt="Foto del campeón">${input}<label class="btn sm" for="ch-photo">Cambiar foto</label><button type="button" class="btn sm ghost" data-act="rmchphoto">Quitar foto</button></div>`
-    : `<div class="photo-pick">${input}<label class="btn" for="ch-photo">Agregar foto del campeón</label><span class="hint" style="margin:0">Opcional.</span></div>`;
+  return CH.url ? `<div class="photo-pick"><img src="${esc(CH.url)}" alt="Foto del torneo">${input}<label class="btn sm" for="ch-photo">Cambiar foto</label><button type="button" class="btn sm ghost" data-act="rmchphoto">Quitar foto</button></div>`
+    : `<div class="photo-pick">${input}<label class="btn" for="ch-photo">Agregar foto</label><span class="hint" style="margin:0">Opcional: el ganador, el trofeo o la mesa final.</span></div>`;
 }
+const chReset = () => { if (CH.blob && CH.url) URL.revokeObjectURL(CH.url); CH = { blob: null, url: null, existing: null }; };
 const refreshChPhoto = () => { const el = document.getElementById('chphotobox'); if (el) el.innerHTML = champPicker(); };
 const refreshPhoto = () => { const el = document.getElementById('photobox'); if (el) el.innerHTML = photoPicker(); };
 const hasVp = (D, id) => D.vp[id] !== '' && D.vp[id] != null && Number.isFinite(+D.vp[id]);
@@ -849,7 +896,8 @@ function vPartida() {
       <textarea id="imp-text" aria-label="Mensaje de la partida" placeholder="Partida Liga Elo Catan Club MTY · …&#10;Código para importar:&#10;LEC1-…"></textarea>
       <div class="impphotobox" style="margin-top:10px">${impPicker()}</div>
       <div class="actions" style="margin-top:10px"><button class="btn primary" type="submit">Importar y revisar</button></div></form></details>` : '';
-  return head + note + out + imp + `<form id="gform" class="panel pad" autocomplete="off">
+  const tl = D.tLink && tById(D.tLink.t) ? `<div class="notice"><span><b>Mesa ${D.tLink.i + 1} · ${esc(tPhaseLabel(tById(D.tLink.t), D.tLink.k))}</b> del torneo ${esc(tById(D.tLink.t).name)}. Anota puntos, lugar y color de cada jugador y guarda.</span></div>` : '';
+  return head + tl + note + out + (D.tLink ? '' : imp) + `<form id="gform" class="panel pad" autocomplete="off">
     <div class="frow">
       <label class="f">Fecha<input type="date" id="g-date" value="${esc(D.date)}" required></label>
       <label class="f">Notas (opcional)<input type="text" id="g-notes" value="${esc(D.notes)}" placeholder="Ej. Navegantes, mapa aleatorio" maxlength="80"></label>
@@ -991,7 +1039,7 @@ function vPlayer(id) {
     ? `<form id="rform" class="addp" style="margin-top:10px"><input type="text" id="r-name" value="${esc(p.name)}" maxlength="40" aria-label="Nuevo nombre"><button class="btn primary sm" type="submit">Guardar</button><button class="btn sm" type="button" data-act="norename">Cancelar</button></form>`
     : `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px"><button class="btn sm ghost" data-act="rename">Cambiar nombre</button>${memberBtns(id)}${!C.P[id] ? (conf ? `<span class="confirm">¿Eliminar jugador?<button class="btn sm danger" data-delplayer="${id}">Eliminar</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn sm ghost" data-ask="p:${id}">Eliminar</button>`) : ''}</div>`;
   return `<button class="btn ghost" data-act="back" style="padding-left:0;margin-bottom:8px">← Todos los jugadores</button>
-  <div class="phead">${sw(s.fav, 'lg')}<h2>${esc(p.name)}</h2>${gtag(id, 'lg')}${(() => { const ys = (S.data.champions || []).filter(c => champKey(c.name) === champKey(p.name)).map(c => c.year).sort(); return ys.length ? `<button type="button" class="ptitle" data-tab="campeones">Campeón del torneo ${ys.join(' y ')}</button>` : ''; })()}${s.n === 0 ? '' : prov ? `<span class="prov">Posicionamiento ${s.n}/${cfg.provGames}</span>` : tierHtml(s.elo)}</div>
+  <div class="phead">${sw(s.fav, 'lg')}<h2>${esc(p.name)}</h2>${gtag(id, 'lg')}${(() => { const w = toursWonBy(id); return !w.length ? '' : `<button type="button" class="ptitle" data-tab="campeones">${w.length === 1 ? `Campeón: ${esc(w[0].name)}` : `Campeón de ${w.length} torneos`}</button>`; })()}${s.n === 0 ? '' : prov ? `<span class="prov">Posicionamiento ${s.n}/${cfg.provGames}</span>` : tierHtml(s.elo)}</div>
   ${manage}${guestPanel(id)}
   <div class="stack" style="margin-top:16px" ${isGuest(id) ? 'hidden' : ''}>
     <div class="stats">
@@ -1037,38 +1085,250 @@ function drawChart(el) {
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Evolución del Elo">${grid}${bl}<path d="${area}" style="fill:var(--sea)" fill-opacity=".1"/><path d="${line}" fill="none" style="stroke:var(--sea)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}<circle cx="${end[0]}" cy="${end[1]}" r="4.5" style="fill:var(--sea)"/>${xl}</svg>`;
 }
 
+const tours = () => [...((S.data.cfg.tournaments) || [])].sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || 0) - (a.createdAt || 0));
+const tWinnerP = t => (t.winnerId && playerById(t.winnerId)) || (t.winner ? players().find(p => champKey(p.name) === champKey(t.winner)) : null);
+const toursWonBy = id => { const p = playerById(id); return tours().filter(t => t.winner && (t.winnerId === id || (!t.winnerId && p && champKey(t.winner) === champKey(p.name)))); };
+function tForm() {
+  const t = S.tEdit ? (S.data.cfg.tournaments || []).find(x => x.id === S.tEdit) : null;
+  const opts = [...players()].sort((a, b) => a.name.localeCompare(b.name, 'es')).map(p => `<option value="${esc(p.name)}"></option>`).join('');
+  return `<form id="tform" class="panel pad tform" autocomplete="off">
+    <h3 style="margin:0 0 10px">${t ? 'Editar torneo' : 'Nuevo torneo'}</h3>
+    <div class="frow"><label class="f">Nombre del torneo<input type="text" id="t-name" maxlength="70" placeholder="Ej. Torneo de Invierno" value="${esc(t ? t.name : '')}" required></label>
+    <label class="f">Fecha<input type="date" id="t-date" value="${esc(t ? t.date : today())}" required></label></div>
+    <label class="f" style="margin-top:10px">Descripción<textarea id="t-desc" maxlength="600" rows="3" placeholder="Formato, sede, cuántos jugaron, reglas especiales…">${esc(t ? t.desc || '' : '')}</textarea></label>
+    <label class="f" style="margin-top:10px">Premios<textarea id="t-prizes" maxlength="600" rows="3" placeholder="Un premio por renglón&#10;1º lugar: …&#10;2º lugar: …">${esc(t ? t.prizes || '' : '')}</textarea></label>
+    <label class="f" style="margin-top:10px">Ganador<input type="text" id="t-winner" list="t-plist" maxlength="40" placeholder="Déjalo vacío si todavía no se juega" value="${esc(t ? t.winner || '' : '')}"><datalist id="t-plist">${opts}</datalist></label>
+    <p class="hint" style="margin:4px 0 0">Escribe el nombre y elígelo de las sugerencias para ligarlo a su perfil. También puede ser alguien que no está en la liga.</p>
+    <div id="chphotobox" style="margin-top:12px">${champPicker()}</div>
+    <div class="actions" style="margin-top:14px"><button class="btn primary" type="submit">${t ? 'Guardar cambios' : 'Guardar torneo'}</button><button class="btn" type="button" data-act="tcancel">Cancelar</button></div>
+  </form>`;
+}
+/* ===== Torneos: formato, participantes, mesas, clasificación ===== */
+const TF_DEF = { qual: 'rondas', rounds: 3, tableSize: 4, qualAdv: 4, perTable: 1, semis: false, semiPerTable: 1 };
+const tById = id => (S.data.cfg.tournaments || []).find(x => x.id === id);
+const gById = id => id ? S.data.games.find(g => g.id === id) : null;
+const tFmt = t => ({ ...TF_DEF, ...(t.format || {}) });
+function tPhases(t) {
+  const f = tFmt(t), ph = [];
+  if (f.qual === 'rondas') for (let i = 1; i <= Math.max(1, f.rounds); i++) ph.push({ key: 'q' + i, group: 'qual', label: `Ronda ${i}` });
+  if (f.qual === 'eliminatoria') ph.push({ key: 'q1', group: 'qual', label: 'Eliminatoria' });
+  if (f.semis) ph.push({ key: 'semi', group: 'semi', label: 'Semifinal' });
+  ph.push({ key: 'final', group: 'final', label: 'Final' });
+  return ph;
+}
+const tTables = (t, key) => ((t.rounds || {})[key] || {}).tables || [];
+const tPhaseLabel = (t, key) => (tPhases(t).find(p => p.key === key) || { label: key }).label;
+const tParts = t => (t.participants || []).filter(id => playerById(id));
+// one row per player per captured table: wins, VP capped at 10, VP% of the table
+function tScore(t, keys) {
+  const st = {};
+  keys.forEach(k => tTables(t, k).forEach(tb => {
+    const g = gById(tb.g); if (!g) return;
+    const rs = (g.results || []).filter(r => Number.isFinite(+r.vp));
+    const tot = rs.reduce((a, r) => a + Math.min(10, +r.vp), 0) || 1;
+    rs.forEach(r => { const o = st[r.playerId] ||= { id: r.playerId, n: 0, wins: 0, vp: 0, pct: 0 }; o.n++; if (+r.place === 1) o.wins++; o.vp += Math.min(10, +r.vp); o.pct += Math.min(10, +r.vp) / tot * 100; });
+  }));
+  return st;
+}
+const tRank = rows => rows.sort((a, b) => b.wins - a.wins || b.vp - a.vp || b.pct - a.pct || (playerById(a.id)?.name || '').localeCompare(playerById(b.id)?.name || '', 'es'));
+const tGroupKeys = (t, group) => tPhases(t).filter(p => p.group === group).map(p => p.key);
+const tDone = (t, keys) => keys.length > 0 && keys.every(k => { const tb = tTables(t, k); return tb.length > 0 && tb.every(x => gById(x.g)); });
+function tAutoAdv(t, group) {
+  const f = tFmt(t), keys = tGroupKeys(t, group);
+  if (!tDone(t, keys)) return null;
+  if (group === 'qual' && f.qual === 'rondas') return tRank(Object.values(tScore(t, keys))).slice(0, Math.max(1, f.qualAdv)).map(x => x.id);
+  const per = group === 'semi' ? f.semiPerTable : f.perTable, out = [];
+  keys.forEach(k => tTables(t, k).forEach(tb => {
+    const g = gById(tb.g); if (!g) return;
+    const sc = tScore({ rounds: { x: { tables: [tb] } } }, ['x']);
+    const rows = (g.results || []).map(r => ({ ...(sc[r.playerId] || { id: r.playerId, wins: 0, vp: 0, pct: 0 }), place: +r.place || 99 }))
+      .sort((a, b) => a.place - b.place || b.vp - a.vp || b.pct - a.pct);
+    rows.slice(0, Math.max(1, per)).forEach(x => out.push(x.id));
+  }));
+  return out;
+}
+const tAdv = (t, group) => ((t.adv || {})[group]) || tAutoAdv(t, group);
+function tPool(t, key) {
+  const f = tFmt(t), ph = tPhases(t).find(p => p.key === key);
+  if (!ph || ph.group === 'qual') return tParts(t);
+  if (ph.group === 'semi') return f.qual === 'ninguna' ? tParts(t) : (tAdv(t, 'qual') || []);
+  if (f.semis) return tAdv(t, 'semi') || [];
+  return f.qual === 'ninguna' ? tParts(t) : (tAdv(t, 'qual') || []);
+}
+function tSizes(n, size) {
+  if (n <= 0) return [];
+  const k = Math.max(1, Math.ceil(n / size)), base = Math.floor(n / k), extra = n % k;
+  return Array.from({ length: k }, (_, i) => base + (i < extra ? 1 : 0));
+}
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function tRandomTables(t, key, pool) {
+  const size = tFmt(t).tableSize, sizes = tSizes(pool.length, size);
+  const met = new Set(); // pairs that already shared a table in this tournament
+  tPhases(t).forEach(p => { if (p.key === key) return; tTables(t, p.key).forEach(tb => tb.p.forEach(a => tb.p.forEach(b => { if (a < b) met.add(a + '|' + b); }))); });
+  let best = null, bestRep = Infinity;
+  for (let tries = 0; tries < 400 && bestRep > 0; tries++) {
+    const sh = shuffle(pool); let i = 0, rep = 0;
+    const tabs = sizes.map(s => { const p = sh.slice(i, i + s); i += s; p.forEach(a => p.forEach(b => { if (a < b && met.has(a + '|' + b)) rep++; })); return { p, g: null }; });
+    if (rep < bestRep) { best = tabs; bestRep = rep; }
+  }
+  return best || [];
+}
+function tSeededTables(t, key, pool) {
+  const st = tScore(t, tGroupKeys(t, 'qual').concat(key === 'final' && tFmt(t).semis ? tGroupKeys(t, 'semi') : []));
+  const ranked = tRank(pool.map(id => st[id] || { id, wins: 0, vp: 0, pct: 0 })).map(x => x.id);
+  if (key === 'final') return [{ p: ranked, g: null }];
+  const sizes = tSizes(ranked.length, tFmt(t).tableSize), k = sizes.length, tabs = sizes.map(() => ({ p: [], g: null }));
+  ranked.forEach((id, i) => { const lap = Math.floor(i / k), pos = i % k; tabs[lap % 2 ? k - 1 - pos : pos].p.push(id); });
+  return tabs;
+}
+const tLink = (tid, key) => `${tid}|${key}`;
+
+function tStandingsHtml(t) {
+  const keys = tGroupKeys(t, 'qual'), st = tScore(t, keys);
+  const rows = tRank(tParts(t).map(id => st[id] || { id, n: 0, wins: 0, vp: 0, pct: 0 }));
+  if (!rows.some(r => r.n)) return '';
+  const adv = new Set(tAdv(t, 'qual') || []), done = tDone(t, keys);
+  return `<div class="panel tbl-wrap" style="margin-bottom:12px"><table class="tst"><thead><tr><th>#</th><th>Jugador</th><th class="r">PJ</th><th class="r">Ganadas</th><th class="r">PV</th><th class="r">Ratio</th></tr></thead><tbody>${rows.map((r, i) =>
+    `<tr class="${adv.has(r.id) ? 'adv' : ''}"><td class="num">${i + 1}</td><td><b>${pname(r.id)}</b>${gtag(r.id, 'sm')}${adv.has(r.id) ? ' <span class="advtag">Pasa</span>' : ''}</td><td class="r num">${r.n}</td><td class="r num">${r.wins}</td><td class="r num">${r.vp}</td><td class="r num">${r.pct.toFixed(2)}%</td></tr>`).join('')}</tbody></table></div>
+    <p class="hint" style="margin:-4px 0 12px">Orden: partidas ganadas, luego puntos de victoria (máximo 10 por partida) y luego ratio: la suma, partida por partida, de tus PV entre los PV de toda la mesa.${done ? '' : ' La clasificación es parcial hasta capturar todas las mesas.'}</p>`;
+}
+function tTableHtml(t, ph, tb, i, adm) {
+  const g = gById(tb.g), id = tLink(t.id, ph.key) + '|' + i;
+  const rows = g && C.G[g.id] ? C.G[g.id] : null;
+  const body = rows
+    ? `<div class="gl tgl">${rows.map(r => `<span class="pos ${r.place === 1 ? 'p1' : ''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}${gtag(r.playerId, 'sm')}</span><span class="vp">${r.vp} PV</span>${dcell(r)}`).join('')}</div>`
+    : `<ul class="tseats">${tb.p.map(pid => `<li>${dot(pid)}${pname(pid)}${gtag(pid, 'sm')}</li>`).join('')}</ul>`;
+  const conf = S.confirm === 'tu:' + id;
+  const acts = !adm ? '' : g
+    ? (conf ? `<span class="confirm">¿Borrar el resultado de esta mesa?<button class="btn sm danger" data-tunres="${esc(id)}">Borrar</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn sm ghost" data-ask="tu:${esc(id)}">Borrar resultado</button>`)
+    : (tb.p.length >= 2 ? `<button class="btn sm primary" data-tcap="${esc(id)}">Capturar resultado</button>` : '<span class="muted" style="font-size:13px">Faltan jugadores</span>');
+  return `<div class="ttable ${g ? 'done' : ''}"><div class="tth"><b>Mesa ${i + 1}</b>${g ? `<span class="muted">${C.CNT[g.id] && !C.CNT[g.id].counts ? 'No cuenta para Elo' : 'Capturada'}</span>` : `<span class="muted">${tb.p.length} jugadores</span>`}</div>${body}${acts ? `<div class="tacts">${acts}</div>` : ''}</div>`;
+}
+function tEditTablesHtml(t, ph) {
+  const tabs = S.tTabsDraft || [], pool = tParts(t).concat((tTables(t, ph.key).flatMap(x => x.p)).filter(id => !tParts(t).includes(id)));
+  const opts = sel => `<option value="">—</option>${[...new Set(pool)].sort((a, b) => (playerById(a)?.name || '').localeCompare(playerById(b)?.name || '', 'es')).map(id => `<option value="${id}" ${id === sel ? 'selected' : ''}>${esc(playerById(id)?.name || '?')}</option>`).join('')}`;
+  return `<form id="ttform" class="ttedit" data-key="${ph.key}" autocomplete="off">${tabs.map((tb, i) => tb.g && gById(tb.g)
+      ? `<div class="ttable done"><div class="tth"><b>Mesa ${i + 1}</b><span class="muted">Ya tiene resultado</span></div><ul class="tseats">${tb.p.map(pid => `<li>${pname(pid)}</li>`).join('')}</ul></div>`
+      : `<div class="ttable"><div class="tth"><b>Mesa ${i + 1}</b>${tabs.length > 1 ? `<button type="button" class="linkbtn" data-ttrm="${i}">Quitar mesa</button>` : ''}</div>${Array.from({ length: Math.max(tFmt(t).tableSize, tb.p.length, 3) }, (_, s) => `<select class="sel" data-tt="${i}" aria-label="Mesa ${i + 1}, lugar ${s + 1}">${opts(tb.p[s] || '')}</select>`).join('')}</div>`).join('')}
+    <div class="actions" style="margin-top:10px"><button type="button" class="btn sm" data-act="ttadd">+ Mesa</button><button type="submit" class="btn primary sm">Guardar mesas</button><button type="button" class="btn sm" data-act="ttcancel">Cancelar</button></div></form>`;
+}
+function tPhaseHtml(t, ph, adm) {
+  const tabs = tTables(t, ph.key), pool = tPool(t, ph.key), anyRes = tabs.some(x => gById(x.g));
+  const editing = adm && S.tEditKey === ph.key;
+  let tools = '';
+  if (adm && !editing) {
+    const seedable = ph.group !== 'qual';
+    tools = !tabs.length
+      ? (pool.length >= 2 ? `<div class="tacts"><button class="btn sm primary" data-tgen="${ph.key}" data-mode="rand">Armar mesas al azar</button>${seedable ? `<button class="btn sm" data-tgen="${ph.key}" data-mode="seed">Armar por clasificación</button>` : ''}<button class="btn sm ghost" data-tgen="${ph.key}" data-mode="manual">Armar a mano</button></div>` : '')
+      : `<div class="tacts">${anyRes ? '' : `<button class="btn sm ghost" data-tgen="${ph.key}" data-mode="rand">Volver a sortear</button>`}<button class="btn sm ghost" data-tedtab="${ph.key}">Editar mesas</button></div>`;
+  }
+  const waiting = !tabs.length && pool.length < 2 ? `<p class="muted" style="margin:0">${ph.group === 'qual' ? 'Primero agrega a los participantes.' : 'Se arma cuando termine la fase anterior o cuando elijas a mano quién pasa.'}</p>` : '';
+  const poolNote = ph.group !== 'qual' && pool.length ? `<p class="hint" style="margin:0 0 8px">Juegan: ${pool.map(id => pname(id)).join(', ')}.</p>` : '';
+  return `<section class="tphase"><h3>${ph.label}</h3>${poolNote}${editing ? tEditTablesHtml(t, ph) : `${tabs.length ? `<div class="ttables">${tabs.map((tb, i) => tTableHtml(t, ph, tb, i, adm)).join('')}</div>` : waiting}${tools}`}</section>`;
+}
+function tAdvHtml(t, group, adm) {
+  const f = tFmt(t), auto = tAutoAdv(t, group), man = (t.adv || {})[group], cur = man || auto;
+  const next = group === 'qual' ? (f.semis ? 'la semifinal' : 'la final') : 'la final';
+  if (!adm && !cur) return '';
+  const edit = adm && S.tAdvEdit === group;
+  if (edit) {
+    const pool = group === 'qual' ? tParts(t) : tTables(t, 'semi').flatMap(x => x.p);
+    return `<form id="tadvform" class="panel pad tadv" data-group="${group}"><p class="lbl" style="margin:0 0 6px">Quiénes pasan a ${next}</p><div class="tchecks">${[...new Set(pool)].map(id => `<label><input type="checkbox" value="${id}" ${(cur || []).includes(id) ? 'checked' : ''}> ${pname(id)}</label>`).join('')}</div>
+      <div class="actions" style="margin-top:10px"><button class="btn primary sm" type="submit">Guardar</button>${man ? '<button class="btn sm" type="button" data-act="tadvauto">Volver a automático</button>' : ''}<button class="btn sm" type="button" data-act="tadvcancel">Cancelar</button></div></form>`;
+  }
+  return `<div class="panel pad tadv"><p class="lbl" style="margin:0 0 4px">Pasan a ${next}${man ? ' · elegidos a mano' : ''}</p><p style="margin:0">${cur ? cur.map(id => `<b>${pname(id)}</b>`).join(', ') : '<span class="muted">Se calcula al capturar todas las mesas.</span>'}</p>${adm ? `<button class="linkbtn" style="margin-top:6px" data-tadv="${group}">Elegir a mano</button>` : ''}</div>`;
+}
+function tFormatHtml(t, adm) {
+  const f = tFmt(t), any = tPhases(t).some(p => tTables(t, p.key).length);
+  const txt = `${f.qual === 'rondas' ? `${f.rounds} ronda${f.rounds === 1 ? '' : 's'} clasificatoria${f.rounds === 1 ? '' : 's'}, pasan los ${f.qualAdv} mejores` : f.qual === 'eliminatoria' ? `Eliminatoria directa, pasa${f.perTable === 1 ? '' : 'n'} ${f.perTable} por mesa` : 'Sin fase clasificatoria'}${f.semis ? ` · Semifinal, pasa${f.semiPerTable === 1 ? '' : 'n'} ${f.semiPerTable} por mesa` : ''} · Final · Mesas de ${f.tableSize}`;
+  if (!adm) return `<p class="tfmt">${txt}</p>`;
+  if (!S.tFmtEdit) return `<div class="panel pad" style="margin-bottom:12px"><p class="lbl" style="margin:0 0 4px">Formato</p><p style="margin:0">${txt}</p><button class="linkbtn" style="margin-top:6px" data-act="tfmtedit">Cambiar formato</button></div>`;
+  return `<form id="tfmtform" class="panel pad tform" autocomplete="off"><p class="lbl" style="margin:0 0 8px">Formato del torneo</p>
+    ${any ? '<p class="warn" style="margin:0 0 10px">Ya hay mesas armadas. Cambiar el formato no borra resultados, pero revisa las fases después.</p>' : ''}
+    <div class="frow"><label class="f">Fase clasificatoria<select class="sel" id="tf-qual"><option value="rondas" ${f.qual === 'rondas' ? 'selected' : ''}>Por rondas (suma de puntos)</option><option value="eliminatoria" ${f.qual === 'eliminatoria' ? 'selected' : ''}>Eliminatoria directa</option><option value="ninguna" ${f.qual === 'ninguna' ? 'selected' : ''}>Ninguna</option></select></label>
+    <label class="f">Jugadores por mesa<select class="sel" id="tf-size"><option value="4" ${f.tableSize === 4 ? 'selected' : ''}>4</option><option value="3" ${f.tableSize === 3 ? 'selected' : ''}>3</option></select></label></div>
+    <div class="frow" style="margin-top:10px"><label class="f">Rondas clasificatorias<input type="number" id="tf-rounds" min="1" max="8" value="${f.rounds}"></label>
+    <label class="f">Pasan (por rondas)<input type="number" id="tf-qadv" min="1" max="64" value="${f.qualAdv}"></label>
+    <label class="f">Pasan por mesa (eliminatoria)<input type="number" id="tf-per" min="1" max="4" value="${f.perTable}"></label></div>
+    <label class="tcheck" style="margin-top:12px"><input type="checkbox" id="tf-semis" ${f.semis ? 'checked' : ''}> Hay semifinal antes de la final</label>
+    <div class="frow" style="margin-top:8px"><label class="f">Pasan por mesa de semifinal<input type="number" id="tf-sper" min="1" max="4" value="${f.semiPerTable}"></label></div>
+    <div class="actions" style="margin-top:12px"><button class="btn primary sm" type="submit">Guardar formato</button><button class="btn sm" type="button" data-act="tfmtcancel">Cancelar</button></div></form>`;
+}
+function tPartsHtml(t, adm) {
+  const ps = tParts(t), inTable = new Set(tPhases(t).flatMap(p => tTables(t, p.key).flatMap(x => x.p)));
+  const list = ps.length ? `<div class="tparts">${ps.map(id => `<span class="tpart">${pname(id)}${gtag(id, 'sm')}${adm && !inTable.has(id) ? `<button type="button" class="tpx" data-tprm="${id}" aria-label="Quitar a ${pname(id)}">×</button>` : ''}</span>`).join('')}</div>` : '<p class="muted" style="margin:0">Aún no hay participantes.</p>';
+  if (!adm) return `<div class="panel pad" style="margin-bottom:12px"><p class="lbl" style="margin:0 0 6px">Participantes (${ps.length})</p>${list}</div>`;
+  const opts = [...players()].filter(p => !ps.includes(p.id)).sort((a, b) => a.name.localeCompare(b.name, 'es')).map(p => `<option value="${esc(p.name)}"></option>`).join('');
+  const pend = S.tpNew && S.tpNew.length ? `<div class="notice" style="margin-top:10px;flex-direction:column"><span>${S.tpNew.map(n => `<b>${esc(n)}</b>`).join(', ')} no ${S.tpNew.length === 1 ? 'está' : 'están'} en la liga. ¿Cómo ${S.tpNew.length === 1 ? 'lo' : 'los'} agrego?</span><div class="tacts" style="margin-top:6px"><button class="btn sm primary" data-tpnew="invitado">Como invitado${S.tpNew.length === 1 ? '' : 's'}</button><button class="btn sm" data-tpnew="socio">Como socio${S.tpNew.length === 1 ? '' : 's'}</button><button class="btn sm ghost" data-act="tpnewcancel">Cancelar</button></div></div>` : '';
+  return `<div class="panel pad" style="margin-bottom:12px"><p class="lbl" style="margin:0 0 6px">Participantes (${ps.length})</p>${list}
+    <form id="tpform" class="addp" autocomplete="off" style="margin-top:10px"><input type="text" id="tp-name" list="tp-list" placeholder="Nombre, o varios separados por comas" aria-label="Agregar participantes"><datalist id="tp-list">${opts}</datalist><button class="btn primary" type="submit">Agregar</button></form>${pend}</div>`;
+}
+function vTorneo(t) {
+  const adm = isAdmin(), prizes = String(t.prizes || '').split('\n').map(x => x.trim()).filter(Boolean), wp = tWinnerP(t);
+  const head = `<button class="btn ghost" data-act="tback" style="padding-left:0;margin-bottom:8px">← Todos los torneos</button>
+    <div class="sec-head"><div><h2>${esc(t.name)}</h2><p>${fmtDate(t.date)}${t.desc ? ` · ${esc(t.desc)}` : ''}</p></div>${adm ? `<button class="btn sm ghost" data-tedit="${t.id}">Editar datos</button>` : ''}</div>
+    <div class="twin" style="margin-bottom:12px">${t.winner ? `<span class="crown-tag">Campeón</span><b>${esc(t.winner)}</b>${wp ? `<button type="button" class="linkbtn" data-player="${wp.id}">Ver su Elo</button>` : ''}` : '<span class="tsoon">Ganador por definir</span>'}</div>
+    ${prizes.length ? `<div class="panel pad tprz" style="margin-bottom:12px"><p class="lbl" style="margin:0 0 4px">Premios</p><ul>${prizes.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}`;
+  const form = adm && S.tForm ? tForm() : '';
+  const f = tFmt(t), phases = tPhases(t);
+  let body = '';
+  phases.forEach((ph, i) => {
+    body += tPhaseHtml(t, ph, adm);
+    const last = i === phases.length - 1 || phases[i + 1].group !== ph.group;
+    if (ph.group === 'qual' && last && f.qual === 'rondas') body += tStandingsHtml(t);
+    if (last && ph.group === 'qual') body += tAdvHtml(t, 'qual', adm);
+    if (last && ph.group === 'semi') body += tAdvHtml(t, 'semi', adm);
+  });
+  return head + form + tFormatHtml(t, adm) + tPartsHtml(t, adm) + body + `<p class="hint" style="margin-top:14px">Cada mesa capturada es una partida normal de la liga: cuenta para el Elo si en la mesa hay mínimo ${MIN_SOCIOS} socios.</p>`;
+}
+function ttSync() {
+  if (!S.tTabsDraft) return;
+  const sel = [...document.querySelectorAll('#ttform select[data-tt]')];
+  if (!sel.length) return;
+  const by = {}; sel.forEach(x => { (by[x.dataset.tt] ||= []).push(x.value); });
+  S.tTabsDraft = S.tTabsDraft.map((tb, i) => tb.g && gById(tb.g) ? tb : { p: (by[i] || tb.p).filter(Boolean), g: null });
+}
+async function tSave(mut, ok) {
+  const id = S.tSel;
+  return commit(d => { const L = [...(d.cfg.tournaments || [])], k = L.findIndex(x => x.id === id); if (k < 0) return; const t = JSON.parse(JSON.stringify(L[k])); mut(t, d); L[k] = t; d.cfg.tournaments = L; }, { ok, tab: 'campeones' });
+}
+
 function vCampeones() {
-  const list = champs(), { nth, total } = champTitles();
-  const asc = [...list].reverse();
-  const names = Object.keys(total);
-  const multi = list.filter((c, i, a) => total[champKey(c.name)] > 1 && a.findIndex(x => champKey(x.name) === champKey(c.name)) === i);
-  const img = (c, cls = '') => { const src = photoSrc(c.photo); return src ? `<img data-cphoto src="${esc(src)}" alt="${esc(c.name)}, campeón ${c.year}" loading="lazy" ${cls}>` : `<div class="noph">Sin foto</div>`; };
-  const who = c => `${esc(c.name)}${c.alias ? ` <span class="al">“${esc(c.alias)}”</span>` : ''}`;
-  const pl = c => players().find(p => champKey(p.name) === champKey(c.name));
+  if (S.tSel) { const t = tById(S.tSel); if (t) return vTorneo(t); S.tSel = null; }
+  const list = tours(), adm = isAdmin();
+  const done = list.filter(t => t.winner), next = list.filter(t => !t.winner).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  const wins = {}; done.forEach(t => { const k = champKey(t.winner); wins[k] = (wins[k] || 0) + 1; });
+  const top = Object.entries(wins).filter(([, n]) => n > 1).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, n]) => `<span>${esc(done.find(t => champKey(t.winner) === k).winner)}: <b>${n}</b> títulos</span>`).join('');
   const hero = `<section class="hall" aria-labelledby="hall-t"><div class="hall-in">
     <p class="hall-eyebrow">Catan Club MTY</p>
-    <h2 id="hall-t">Salón de Campeones</h2>
-    <p class="hall-lede">Los ganadores de cada gran torneo del club. ¿Tienes lo necesario para que tu nombre sea el siguiente?</p>
+    <h2 id="hall-t">Torneos</h2>
+    <p class="hall-lede">Cada torneo del club con sus premios y su campeón. ¿Tienes lo necesario para que tu nombre sea el siguiente?</p>
     <figure class="belt crest"><img src="${CLUBLOGO}" alt="Escudo del Catan Club MTY"></figure>
-    ${asc.length ? `<p class="plates-lbl">Campeones por año</p><div class="plates">${asc.map(c => `<div class="plate"><span>${c.year}</span><b>${esc(c.name)}</b></div>`).join('')}</div>` : ''}
-    ${list.length ? `<div class="hall-stats"><span><b>${list.length}</b> ediciones</span><span><b>${names.length}</b> campeones distintos</span>${multi.map(c => `<span>${esc(c.name)}: <b>${total[champKey(c.name)]}</b> títulos</span>`).join('')}</div>` : ''}
+    ${list.length ? `<div class="hall-stats"><span><b>${list.length}</b> torneo${list.length === 1 ? '' : 's'}</span><span><b>${Object.keys(wins).length}</b> campeón${Object.keys(wins).length === 1 ? '' : 'es'} distinto${Object.keys(wins).length === 1 ? '' : 's'}</span>${top}</div>` : ''}
   </div></section>`;
-  if (!list.length) return hero + `<div class="panel empty"><h3>Aún no hay campeones registrados</h3><p>El admin puede agregar al campeón de cada torneo, con su foto, desde la pestaña Admin.</p></div>`;
-  const cur = list[0], n0 = nth[cur.id];
-  const now = `<article class="panel champ-now">${img(cur)}<div style="min-width:0">
-    <div class="k">Campeón vigente · ${cur.year}</div>
-    <h3>${who(cur)}</h3>
-    <p>${n0 > 1 ? `${MULTI[n0] || n0 + ' títulos'}: ${ORD[n0] ? ORD[n0].toLowerCase() : n0 + 'º'} título del torneo. Ya había ganado en ${list.filter(c => champKey(c.name) === champKey(cur.name) && c.id !== cur.id).map(c => c.year).sort().join(', ')}.` : 'Primer título del torneo.'}</p>
-    ${pl(cur) ? `<button type="button" class="linkbtn" data-player="${pl(cur).id}" style="margin-top:10px">Ver su Elo en la liga</button>` : ''}
-  </div></article>`;
-  const grid = `<p class="lbl" style="margin-top:4px">Todos los campeones</p><div class="champs">${asc.map(c => {
-    const k = nth[c.id], p = pl(c);
-    return `<article class="panel champ"><div class="ph">${img(c)}<span class="yr">${c.year}</span></div><div class="bd">
-      <span class="nm">${esc(c.name)}</span>${c.alias ? `<span class="al">“${esc(c.alias)}”</span>` : ''}
-      <span class="crown-tag">${k > 1 ? (MULTI[k] || k + ' títulos') : 'Campeón'}</span>
-      ${p ? `<button type="button" class="linkbtn" data-player="${p.id}">Ver su Elo</button>` : ''}
-    </div></article>`; }).join('')}</div>`;
-  return hero + now + grid + (isAdmin() ? `<p class="hint" style="margin-top:14px">Para agregar al campeón de un nuevo torneo, ve a Admin.</p>` : '');
+  const addBtn = adm && !S.tForm ? `<div class="actions" style="margin:0 0 14px"><button class="btn primary" data-act="tnew">+ Registrar torneo</button></div>` : '';
+  const form = adm && S.tForm ? tForm() : '';
+  const card = t => {
+    const src = photoSrc(t.photo), wp = tWinnerP(t), conf = S.confirm === 't:' + t.id;
+    const prizes = String(t.prizes || '').split('\n').map(x => x.trim()).filter(Boolean);
+    const acts = !adm ? '' : conf ? `<span class="confirm">¿Borrar este torneo?<button class="btn sm danger" data-tdel="${t.id}">Borrar</button><button class="btn sm" data-act="noconfirm">No</button></span>`
+      : `<button class="btn sm ghost" data-tedit="${t.id}">Editar</button><button class="btn sm ghost" data-ask="t:${t.id}">Borrar</button>`;
+    return `<article class="panel tcard ${t.winner ? '' : 'upcoming'}">
+      ${src ? `<button type="button" class="tph" data-tphoto="${esc(t.id)}" aria-label="Ver foto de ${esc(t.name)}"><img src="${esc(src)}" alt="Foto de ${esc(t.name)}" loading="lazy"></button>` : ''}
+      <div class="tbd">
+        <div class="thead"><h3>${esc(t.name)}</h3><span class="muted">${fmtDate(t.date)}</span></div>
+        <div class="twin">${t.winner ? `<span class="crown-tag">Campeón</span><b>${esc(t.winner)}</b>${wp ? `<button type="button" class="linkbtn" data-player="${wp.id}">Ver su Elo</button>` : ''}` : '<span class="tsoon">Ganador por definir</span>'}</div>
+        ${t.desc ? `<p class="tdesc">${esc(t.desc).replace(/\n/g, '<br>')}</p>` : ''}
+        ${prizes.length ? `<div class="tprz"><p class="lbl" style="margin:0 0 4px">Premios</p><ul>${prizes.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+        ${(() => { const np = tParts(t).length, ph = tPhases(t).filter(x => tTables(t, x.key).length); return np ? `<p class="tprog">${np} participante${np === 1 ? '' : 's'}${ph.length ? ` · ${ph[ph.length - 1].label}` : ''}</p>` : ''; })()}
+        <div class="tacts"><button class="btn sm ${t.winner ? 'ghost' : 'primary'}" data-tview="${t.id}">Ver torneo</button>${acts}</div>
+      </div></article>`;
+  };
+  if (!list.length) return hero + addBtn + form + `<div class="panel empty"><h3>Aún no hay torneos registrados</h3><p>${adm ? 'Toca "Registrar torneo" para agregar el primero con su descripción, premios y ganador.' : 'Cuando el club registre un torneo aparecerá aquí con sus premios y su campeón.'}</p></div>`;
+  const years = [...new Set(done.map(t => (t.date || '').slice(0, 4)))];
+  return hero + addBtn + form
+    + (next.length ? `<p class="lbl" style="margin-top:4px">Próximos y en curso</p><div class="tlist">${next.map(card).join('')}</div>` : '')
+    + years.map(y => `<p class="lbl tyear">${esc(y)}</p><div class="tlist">${done.filter(t => (t.date || '').slice(0, 4) === y).map(card).join('')}</div>`).join('');
 }
 
 function vFormula() {
@@ -1158,15 +1418,6 @@ function vAdmin() {
       <div class="alist">${(S.admins || []).map(em => { const self = SESS && SESS.email && em.toLowerCase() === SESS.email.toLowerCase(); const conf = S.confirm === 'a:' + em; return `<div class="arow"><span class="sp">${esc(em)}${self ? ' <span class="photo-tag">· tú</span>' : ''}</span>${self ? '' : conf ? `<span class="confirm">¿Quitar?<button class="btn sm danger" data-deladmin="${esc(em)}">Quitar</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn sm ghost" data-ask="a:${esc(em)}">Quitar</button>`}</div>`; }).join('') || '<p class="muted">Cargando…</p>'}</div>
       <form id="adform" class="addp" autocomplete="off" style="margin-top:10px"><input type="email" id="ad-email" placeholder="correo@ejemplo.com" aria-label="Correo del nuevo admin" required><button class="btn primary" type="submit">Agregar admin</button></form>
       <p class="hint">Después, esa persona abre la pestaña Admin, toca "Crear cuenta" con ese mismo correo y confirma el correo que le llega.</p></div>
-    <div class="panel pad"><h3>Campeones de torneo</h3><p class="hint" style="margin:0 0 8px">Agrega al campeón de cada torneo con su foto. Aparece en la sección Campeones.</p>
-      <div class="alist">${champs().map(c => { const conf = S.confirm === 'c:' + c.id; return `<div class="arow"><span class="sp"><b>${c.year}</b> · ${esc(c.name)}${c.alias ? ` “${esc(c.alias)}”` : ''}${photoSrc(c.photo) ? ' <span class="photo-tag">· con foto</span>' : ''}</span>${conf ? `<span class="confirm">¿Quitar?<button class="btn sm danger" data-delchamp="${c.id}">Quitar</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn sm ghost" data-ask="c:${c.id}">Quitar</button>`}</div>`; }).join('') || '<p class="muted">Aún no hay campeones.</p>'}</div>
-      <form id="chform" class="stack" autocomplete="off" style="margin-top:12px;gap:10px">
-        <div class="frow"><label class="f">Año<input type="number" id="ch-year" min="1990" max="2100" step="1" value="${new Date().getFullYear()}"></label>
-        <label class="f">Nombre<input type="text" id="ch-name" maxlength="40" placeholder="Ej. Luis"></label>
-        <label class="f">Apodo (opcional)<input type="text" id="ch-alias" maxlength="30" placeholder="Ej. Checo"></label></div>
-        <div id="chphotobox">${champPicker()}</div>
-        <div><button class="btn primary" type="submit">Agregar campeón</button></div>
-      </form></div>
     <div class="panel pad"><h3>Jugadores</h3><p class="hint" style="margin:0 0 6px">Un jugador solo se puede eliminar si no tiene partidas; borra antes sus partidas si fue un error.</p>
       <div class="alist">${prows || '<p class="muted">Aún no hay jugadores.</p>'}</div></div>
     <div class="panel pad"><h3>Ajustes del cálculo</h3>
@@ -1217,7 +1468,7 @@ function render() {
 }
 function go(tab) {
   if (!TABS.includes(tab)) tab = 'ranking';
-  S.tab = tab; S.confirm = null; S.editName = false; S.inlineEdit = null;
+  S.tab = tab; S.confirm = null; S.editName = false; S.inlineEdit = null; S.tSel = null; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null;
   if (tab !== 'jugadores') S.sel = null;
   try { history.replaceState(null, '', '#' + tab); } catch (e) {}
   render(); window.scrollTo({ top: 0 });
@@ -1302,6 +1553,53 @@ document.addEventListener('click', async e => {
     catch (err) { toast('No se pudo quitar. Revisa que hayas corrido el texto de admins en Supabase.'); }
     S.busy = false; render(); return;
   }
+  if (ds.tview) { S.tSel = ds.tview; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null; S.confirm = null; S.tForm = false; render(); window.scrollTo({ top: 0 }); return; }
+  if (ds.tgen && isAdmin()) {
+    const t = tById(S.tSel), key = ds.tgen; if (!t) return;
+    const pool = tPool(t, key);
+    if (tTables(t, key).some(x => gById(x.g))) return toast('Esa fase ya tiene resultados. Edita las mesas sin resultado.');
+    if (ds.mode === 'manual') { S.tEditKey = key; S.tTabsDraft = tSizes(pool.length, tFmt(t).tableSize).map(() => ({ p: [], g: null })); if (!S.tTabsDraft.length) S.tTabsDraft = [{ p: [], g: null }]; render(); return; }
+    const tabs = ds.mode === 'seed' ? tSeededTables(t, key, pool) : (key === 'final' ? [{ p: shuffle(pool), g: null }] : tRandomTables(t, key, pool));
+    await tSave(tt => { tt.rounds = { ...(tt.rounds || {}), [key]: { tables: tabs } }; }, 'Mesas armadas');
+    return;
+  }
+  if (ds.tedtab && isAdmin()) { const t = tById(S.tSel); if (!t) return; S.tEditKey = ds.tedtab; S.tTabsDraft = JSON.parse(JSON.stringify(tTables(t, ds.tedtab))); render(); return; }
+  if (ds.ttrm !== undefined && S.tTabsDraft) { ttSync(); S.tTabsDraft.splice(+ds.ttrm, 1); render(); return; }
+  if (ds.tcap && isAdmin()) {
+    const [tid, key, i] = ds.tcap.split('|'), t = tById(tid), tb = t && tTables(t, key)[+i]; if (!tb) return;
+    const D = newDraft(); D.picked = tb.p.filter(id => playerById(id)).slice(0, 6); D.picked.forEach(id => { D.color[id] = ''; });
+    D.date = t.date || today(); D.notes = `${t.name} · ${tPhaseLabel(t, key)} · Mesa ${+i + 1}`.slice(0, 80); D.tLink = { t: tid, k: key, i: +i };
+    S.draft = D; go('partida'); return;
+  }
+  if (ds.tunres && isAdmin()) {
+    const [tid, key, i] = ds.tunres.split('|'), t = tById(tid), tb = t && tTables(t, key)[+i]; if (!tb) return;
+    const gid = tb.g, ph = gById(gid)?.photo; S.confirm = null;
+    await tSave((tt, d) => { const x = ((tt.rounds || {})[key] || {}).tables || []; if (x[+i]) x[+i].g = null; d.games = d.games.filter(g => g.id !== gid); }, 'Resultado borrado');
+    delAssets([ph]); return;
+  }
+  if (ds.tadv && isAdmin()) { S.tAdvEdit = ds.tadv; render(); return; }
+  if (ds.tpnew && isAdmin()) {
+    const names = S.tpNew || [], asGuest = ds.tpnew === 'invitado', now = Date.now(), ids = names.map(() => uid());
+    S.tpNew = null;
+    await tSave((t, d) => { names.forEach((name, j) => { if (d.players.some(p => fold(p.name) === fold(name))) return; d.players.push({ id: ids[j], name, createdAt: now + j }); if (asGuest) d.cfg.guest = { ...(d.cfg.guest || {}), [ids[j]]: true }; t.participants = [...new Set([...(t.participants || []), ids[j]])]; }); }, names.length === 1 ? `${names[0]} se agregó al torneo` : `${names.length} jugadores agregados al torneo`);
+    return;
+  }
+  if (ds.tprm && isAdmin()) { const id = ds.tprm; await tSave(t => { t.participants = (t.participants || []).filter(x => x !== id); }, 'Participante quitado'); return; }
+  if (ds.tedit) {
+    if (!isAdmin()) return;
+    const t = (S.data.cfg.tournaments || []).find(x => x.id === ds.tedit); if (!t) return;
+    chReset(); if (t.photo && photoSrc(t.photo)) CH = { blob: null, url: photoSrc(t.photo), existing: t.photo };
+    S.tForm = true; S.tEdit = t.id; S.confirm = null; render();
+    setTimeout(() => document.getElementById('tform')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 0); return;
+  }
+  if (ds.tdel) {
+    if (!isAdmin()) return;
+    const id = ds.tdel; S.confirm = null;
+    const ph = (S.data.cfg.tournaments || []).find(x => x.id === id)?.photo;
+    await commit(d => { d.cfg.tournaments = (d.cfg.tournaments || []).filter(x => x.id !== id); }, { ok: 'Torneo borrado', tab: 'campeones', after: () => delAssets([ph]) });
+    return;
+  }
+  if (ds.tphoto) { const t = (S.data.cfg.tournaments || []).find(x => x.id === ds.tphoto); if (t && isAssetId(t.photo)) openLb(t.photo); return; }
   if (ds.delchamp) {
     if (!isAdmin()) return;
     const id = ds.delchamp; S.confirm = null;
@@ -1332,7 +1630,17 @@ document.addEventListener('click', async e => {
       try { navigator.clipboard.writeText(txt).then(() => toast('Copiado. Pégalo en WhatsApp.'), () => { sel(); toast('Mantén presionado el texto y copia.'); }); } catch (e) { sel(); toast('Mantén presionado el texto y copia.'); } break; }
     case 'newshare': S.shareOut = null; S.draft = newDraft(); render(); window.scrollTo({ top: 0 }); break;
     case 'rmimpphoto': if (IMP.url) URL.revokeObjectURL(IMP.url); IMP = { blob: null, url: null }; refreshImpPhoto(); break;
-    case 'rmchphoto': if (CH.url) URL.revokeObjectURL(CH.url); CH = { blob: null, url: null }; refreshChPhoto(); break;
+    case 'rmchphoto': chReset(); refreshChPhoto(); break;
+    case 'tback': S.tSel = null; S.tEditKey = null; S.tAdvEdit = null; S.tFmtEdit = false; S.tpNew = null; S.tForm = false; render(); window.scrollTo({ top: 0 }); break;
+    case 'ttadd': ttSync(); (S.tTabsDraft ||= []).push({ p: [], g: null }); render(); break;
+    case 'ttcancel': S.tEditKey = null; S.tTabsDraft = null; render(); break;
+    case 'tadvcancel': S.tAdvEdit = null; render(); break;
+    case 'tadvauto': { const g = S.tAdvEdit; S.tAdvEdit = null; await tSave(t => { if (t.adv) { t.adv = { ...t.adv }; delete t.adv[g]; } }, 'Ahora se calcula automático'); break; }
+    case 'tfmtedit': S.tFmtEdit = true; render(); break;
+    case 'tfmtcancel': S.tFmtEdit = false; render(); break;
+    case 'tpnewcancel': S.tpNew = null; render(); break;
+    case 'tnew': chReset(); S.tForm = true; S.tEdit = null; render(); setTimeout(() => document.getElementById('tform')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 0); break;
+    case 'tcancel': chReset(); S.tForm = false; S.tEdit = null; render(); break;
     case 'rmphoto': if (S.draft) { if (S.draft.pUrl) URL.revokeObjectURL(S.draft.pUrl); S.draft.pBlob = null; S.draft.pUrl = null; S.draft.photo = null; refreshPhoto(); } break;
     case 'autoplace': if (S.draft) { S.draft.manual = false; autoPlaces(); syncPlaceUI(); refreshPreview(); } break;
     case 'back': S.sel = null; S.editName = false; S.confirm = null; render(); break;
@@ -1362,7 +1670,7 @@ document.addEventListener('change', async e => {
   if (t.id === 'ch-photo') {
     const file = t.files && t.files[0]; if (!file) return;
     toast('Preparando foto…', true);
-    try { const b = await compressPhoto(file); if (CH.url) URL.revokeObjectURL(CH.url); CH = { blob: b, url: URL.createObjectURL(b) }; refreshChPhoto(); toast('Foto lista. Se subirá al agregar al campeón.'); }
+    try { const b = await compressPhoto(file); if (CH.url) URL.revokeObjectURL(CH.url); CH = { blob: b, url: URL.createObjectURL(b), existing: null }; refreshChPhoto(); toast('Foto lista. Se sube al guardar el torneo.'); }
     catch (err) { toast('No se pudo leer esa imagen. Prueba con una foto JPG o PNG.'); }
     return;
   }
@@ -1472,10 +1780,14 @@ document.addEventListener('submit', async e => {
     }
     const data = { id, ...draftData() };
     if (isAssetId(D.photo)) data.photo = D.photo;
-    const ok = await commit(d => { const i = d.games.findIndex(g => g.id === id); if (i >= 0) d.games[i] = data; else d.games.push(data); },
-      { ok: editing ? 'Partida actualizada. El Elo se recalculó.' : 'Partida guardada. El Elo se actualizó.', tab: 'partidas', flash: id,
+    const TL = D.tLink;
+    const ok = await commit(d => { const i = d.games.findIndex(g => g.id === id); if (i >= 0) d.games[i] = data; else d.games.push(data);
+        if (TL) { const L = [...(d.cfg.tournaments || [])], k = L.findIndex(x => x.id === TL.t); if (k >= 0) { const t = JSON.parse(JSON.stringify(L[k])); const tb = ((t.rounds || {})[TL.k] || {}).tables || []; if (tb[TL.i]) tb[TL.i].g = id;
+          if (TL.k === 'final') { const first = data.results.filter(r => +r.place === 1); if (first.length === 1) { const pw = d.players.find(p => p.id === first[0].playerId); if (pw) { t.winner = pw.name; t.winnerId = pw.id; } } }
+          L[k] = t; d.cfg.tournaments = L; } } },
+      { ok: TL ? (TL.k === 'final' ? 'Final capturada. Ya quedó el campeón del torneo.' : 'Mesa capturada.') : editing ? 'Partida actualizada. El Elo se recalculó.' : 'Partida guardada. El Elo se actualizó.', tab: TL ? 'campeones' : 'partidas', flash: id, ...(TL ? {} : {}),
         after: () => { if (oldPhoto && oldPhoto !== data.photo) delAssets([oldPhoto]); } });
-    if (ok) S.draft = newDraft();
+    if (ok) { S.draft = newDraft(); if (TL) { S.tSel = TL.t; render(); window.scrollTo({ top: 0 }); } }
   } else if (f.id === 'login') {
     const email = val('lg-email').trim().toLowerCase(), pw = val('lg-pw');
     S.busy = true;
@@ -1520,21 +1832,53 @@ document.addEventListener('submit', async e => {
     S.draft = r.draft; autoPlaces();
     go('partida');
     toast(r.dup ? 'Ojo: parece que esta partida ya está registrada. Revísala antes de guardar.' : withPhoto ? 'Partida importada con su foto. Revísala y toca Guardar partida.' : 'Partida importada. Si tienes la foto, agrégala en "Foto del tablero" y toca Guardar partida.');
-  } else if (f.id === 'chform') {
+  } else if (f.id === 'ttform') {
     if (!isAdmin()) return;
-    const year = Math.round(+val('ch-year')), name = val('ch-name').trim().slice(0, 40), alias = val('ch-alias').trim().slice(0, 30);
-    if (!Number.isFinite(year) || year < 1990 || year > 2100) return toast('Escribe un año válido.');
-    if (!name) return toast('Escribe el nombre del campeón.');
-    if ((S.data.champions || []).some(c => c.year === year)) return toast(`Ya hay un campeón registrado en ${year}. Quítalo primero si quieres cambiarlo.`);
-    let photo = null;
+    ttSync(); const key = f.dataset.key, tabs = (S.tTabsDraft || []).filter(x => x.p.length);
+    const all = tabs.flatMap(x => x.p); if (new Set(all).size !== all.length) return toast('Hay un jugador repetido en las mesas.');
+    if (tabs.some(x => x.p.length < 2)) return toast('Cada mesa necesita al menos 2 jugadores.');
+    S.tEditKey = null; S.tTabsDraft = null;
+    await tSave(t => { t.rounds = { ...(t.rounds || {}), [key]: { tables: tabs } }; }, 'Mesas guardadas');
+  } else if (f.id === 'tadvform') {
+    if (!isAdmin()) return;
+    const g = f.dataset.group, ids = [...f.querySelectorAll('input[type=checkbox]:checked')].map(x => x.value);
+    if (!ids.length) return toast('Elige al menos a un jugador.');
+    S.tAdvEdit = null;
+    await tSave(t => { t.adv = { ...(t.adv || {}), [g]: ids }; }, 'Quedó la lista de quienes pasan');
+  } else if (f.id === 'tfmtform') {
+    if (!isAdmin()) return;
+    const n = (id, lo, hi, d) => { const v = Math.round(+val(id)); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+    const fmt = { qual: val('tf-qual'), tableSize: +val('tf-size') === 3 ? 3 : 4, rounds: n('tf-rounds', 1, 8, 3), qualAdv: n('tf-qadv', 1, 64, 4), perTable: n('tf-per', 1, 4, 1), semis: !!document.getElementById('tf-semis')?.checked, semiPerTable: n('tf-sper', 1, 4, 1) };
+    S.tFmtEdit = false;
+    await tSave(t => { t.format = fmt; }, 'Formato guardado');
+  } else if (f.id === 'tpform') {
+    if (!isAdmin()) return;
+    const names = [...new Set(val('tp-name').split(/[,\n]/).map(x => x.trim().replace(/\s+/g, ' ').slice(0, 40)).filter(Boolean))];
+    if (!names.length) return toast('Escribe al menos un nombre.');
+    const found = [], missing = [];
+    names.forEach(nm => { const p = players().find(x => fold(x.name) === fold(nm)); if (p) found.push(p.id); else missing.push(nm); });
+    S.tpNew = missing.length ? missing : null;
+    if (found.length) await tSave(t => { t.participants = [...new Set([...(t.participants || []), ...found])]; }, `${found.length} participante${found.length === 1 ? '' : 's'} agregado${found.length === 1 ? '' : 's'}`);
+    else render();
+  } else if (f.id === 'tform') {
+    if (!isAdmin()) return;
+    const name = val('t-name').trim().slice(0, 70), date = val('t-date'), desc = val('t-desc').trim().slice(0, 600), prizes = val('t-prizes').trim().slice(0, 600), winner = val('t-winner').trim().replace(/\s+/g, ' ').slice(0, 40);
+    if (!name) return toast('Escribe el nombre del torneo.');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return toast('Elige la fecha del torneo.');
+    const wp = winner ? players().find(p => champKey(p.name) === champKey(winner)) : null;
+    const old = S.tEdit ? (S.data.cfg.tournaments || []).find(x => x.id === S.tEdit) : null;
+    let photo = CH.existing || null;
     if (CH.blob) {
       S.busy = true; toast('Subiendo foto…', true);
       try { const r = await ASSETS.upload(CH.blob, CH.blob.type ? undefined : { type: 'image/jpeg' }); photo = r.id; }
-      catch (err) { S.busy = false; return toast('No se pudo subir la foto. Inténtalo de nuevo o agrega al campeón sin foto.'); }
+      catch (err) { S.busy = false; return toast('No se pudo subir la foto. Inténtalo de nuevo o guarda el torneo sin foto.'); }
       S.busy = false;
     }
-    const ok = await commit(d => { d.champions = [...(d.champions || []), { id: uid(), year, name, alias, photo }]; }, { ok: `${name} quedó registrado como campeón ${year}`, tab: 'admin' });
-    if (ok) { if (CH.url) URL.revokeObjectURL(CH.url); CH = { blob: null, url: null }; }
+    const rec = { id: old ? old.id : uid(), name, date, desc, prizes, winner, winnerId: wp ? wp.id : null, photo, createdAt: old ? old.createdAt : Date.now() };
+    const oldPhoto = old && old.photo && old.photo !== photo ? old.photo : null;
+    const ok = await commit(d => { const L = [...(d.cfg.tournaments || [])]; const k = L.findIndex(x => x.id === rec.id); if (k >= 0) L[k] = rec; else L.push(rec); d.cfg.tournaments = L; },
+      { ok: old ? 'Torneo actualizado' : `${name} quedó registrado`, tab: 'campeones', after: () => { if (oldPhoto) delAssets([oldPhoto]); } });
+    if (ok) { chReset(); S.tForm = false; S.tEdit = null; if (!old) S.tSel = rec.id; render(); }
   } else if (f.id === 'cform') {
     if (!isAdmin()) return;
     const v = id => Math.round(+val(id));
