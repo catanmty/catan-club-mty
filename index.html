@@ -96,6 +96,11 @@ main{padding-block:20px 64px}
 .meter .ms{font-size:12.5px;color:var(--muted);margin-top:4px}
 .autobk{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--surface-2);font-size:14px}
 .autobk a.btn{text-decoration:none;color:var(--ink)}
+.gfilt{margin-bottom:14px}.gfrow{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px}.gfrow .f{min-width:0}.gfrow select{width:100%}
+@media (max-width:520px){.gfrow{grid-template-columns:1fr 1fr}.gfrow .gfp{grid-column:1/-1}}
+.gfcount{margin:10px 0 0;font-size:13.5px;color:var(--muted)}.gfcount .linkbtn{font-size:13.5px}
+.gmonth{margin:10px 2px 0;font-size:17px;display:flex;align-items:baseline;gap:8px}.gmonth span{font-size:13px;color:var(--muted);font-weight:500;font-family:var(--f-body)}
+.gpager{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:12px 0}.gpager .btn{min-width:40px}.gpgap{color:var(--muted);padding:0 2px}.gpinfo{margin-left:auto;font-size:13.5px;color:var(--muted)}
 .dkbox{margin:0 0 12px;padding:10px 12px;border-radius:8px;background:var(--surface-2);font-size:14px}
 .dkrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.dkrow input{flex:1 1 160px;min-width:0}
 .dkconf{display:flex;flex-direction:column;gap:8px;width:100%;padding:10px 12px;border:1px solid var(--down);border-radius:8px}.dkconf b{color:var(--down);font-size:14px}.dkconf .row{display:flex;flex-wrap:wrap;gap:8px}.dkconf input{flex:1 1 160px;min-width:0}
@@ -1039,7 +1044,7 @@ async function commit(mut, opts = {}) {
     if (JSON.stringify(next.cfg) !== JSON.stringify(S.data.cfg)) { const res = await api('/rest/v1/settings?id=eq.1', { method: 'PATCH', body: { cfg: next.cfg }, prefer: 'return=representation' }); if (!res || !res.length) throw denied(); }
     if (opts.after) { try { opts.after(); } catch (e) {} }
     S.data = await loadAll(); S.busy = false;
-    if (opts.tab) S.tab = opts.tab; if ('sel' in opts) S.sel = opts.sel; if (opts.flash) S.flash = opts.flash;
+    if (opts.tab) S.tab = opts.tab; if ('sel' in opts) S.sel = opts.sel; if (opts.flash) { S.flash = opts.flash; S.gf = null; }
     render(); if (opts.ok) toast(opts.ok);
     return true;
   } catch (e) {
@@ -1337,13 +1342,41 @@ function vPartidas() {
   const admin = isAdmin();
   const head = `<div class="sec-head"><div><h2>Partidas</h2><p>${n ? `${n} partida${n===1?'':'s'} registrada${n===1?'':'s'}. ${admin ? 'Modo admin: puedes editar o borrar cada partida y el Elo se recalcula desde el inicio.' : 'Toca "Ver cálculo" para ver cuánto sumó o restó cada quien contra cada rival.'}` : 'Aquí aparecerá cada partida con el cambio de Elo de cada jugador.'}</p></div><button class="btn primary" data-go="partida">${regLbl()}</button></div>`;
   if (!n) return head + `<div class="panel empty"><h3>Todavía no hay partidas</h3><p>Cuando se registre la primera, aquí verás el resultado y el cambio de Elo de cada jugador.</p></div>`;
-  const cards = [...C.order].reverse().map(g => {
+  const F = S.gf || (S.gf = { y: '', m: '', p: '' });
+  const all = [...C.order].reverse();
+  const cap = w => w[0].toUpperCase() + w.slice(1);
+  const yNow = new Date().getFullYear(), yMin = Math.min(yNow, ...all.map(g => +g.date.slice(0, 4))), yMax = Math.max(yNow, ...all.map(g => +g.date.slice(0, 4)));
+  const years = []; for (let y = yMax; y >= yMin; y--) years.push(String(y));
+  if (F.y && !years.includes(F.y)) F.y = '';
+  const inP = players().filter(q => all.some(g => g.results.some(r => r.playerId === q.id))).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  if (F.p && !inP.some(q => q.id === F.p)) F.p = '';
+  const byP = all.filter(g => !F.p || g.results.some(r => r.playerId === F.p));
+  const yCnt = y => byP.filter(g => g.date.startsWith(y)).length;
+  const mCnt = m => byP.filter(g => (!F.y || g.date.startsWith(F.y)) && g.date.slice(5, 7) === m).length;
+  const list = byP.filter(g => (!F.y || g.date.startsWith(F.y)) && (!F.m || g.date.slice(5, 7) === F.m));
+  const PAGE = 20, pages = Math.max(1, Math.ceil(list.length / PAGE)), fi = S.flash ? list.findIndex(g => g.id === S.flash) : -1;
+  if (fi >= 0) S.gPage = Math.floor(fi / PAGE) + 1;
+  const pg = Math.min(Math.max(1, S.gPage || 1), pages); S.gPage = pg;
+  const from = (pg - 1) * PAGE, shown = list.slice(from, from + PAGE), filt = F.y || F.m || F.p;
+  const bar = `<div class="panel pad gfilt" id="gfilt"><div class="gfrow">
+      <label class="f">Año<select class="sel" id="gf-y"><option value="">Todos</option>${years.map(y => `<option value="${y}" ${F.y === y ? 'selected' : ''}>${y} (${yCnt(y)})</option>`).join('')}</select></label>
+      <label class="f">Mes<select class="sel" id="gf-m"><option value="">Todos</option>${MESES.map((w, i) => { const m = String(i + 1).padStart(2, '0'); return `<option value="${m}" ${F.m === m ? 'selected' : ''}>${cap(w)} (${mCnt(m)})</option>`; }).join('')}</select></label>
+      <label class="f gfp">Jugador<select class="sel" id="gf-p"><option value="">Todos los jugadores</option>${inP.map(q => `<option value="${q.id}" ${F.p === q.id ? 'selected' : ''}>${esc(q.name)}</option>`).join('')}</select></label></div>
+      <p class="gfcount"><b>${filt ? `${list.length} de ${n}` : n}</b> partida${(filt ? n : n) === 1 ? '' : 's'}${list.length > PAGE ? ` · mostrando ${from + 1} a ${from + shown.length}` : ''}${filt ? ' · <button type="button" class="linkbtn" data-act="gfclear">Quitar filtros</button>' : ''}</p></div>`;
+  if (!list.length) return head + bar + `<div class="panel empty"><h3>No hay partidas con esos filtros</h3><p>Prueba con otro año, mes o jugador.</p></div>`;
+  const pager = pages < 2 ? '' : (() => {
+    const nums = [...new Set([1, pg - 1, pg, pg + 1, pages].filter(x => x >= 1 && x <= pages))].sort((a, b) => a - b);
+    let out = '', prev = 0; nums.forEach(x => { if (x - prev > 1) out += '<span class="gpgap">…</span>'; out += `<button class="btn sm ${x === pg ? 'primary' : ''}" data-gpage="${x}" ${x === pg ? 'aria-current="page"' : ''} aria-label="Página ${x}">${x}</button>`; prev = x; });
+    return `<nav class="gpager" aria-label="Páginas de partidas"><button class="btn sm" data-gpage="${pg - 1}" ${pg === 1 ? 'disabled' : ''} aria-label="Página anterior">‹</button>${out}<button class="btn sm" data-gpage="${pg + 1}" ${pg === pages ? 'disabled' : ''} aria-label="Página siguiente">›</button><span class="gpinfo">Página ${pg} de ${pages}</span></nav>`; })();
+  let lastYm = '';
+  const cards = shown.map(g => {
+    const ym = g.date.slice(0, 7), mh = ym !== lastYm ? (() => { lastYm = ym; const cnt = list.filter(x => x.date.startsWith(ym)).length; return `<h3 class="gmonth">${monthName(ym)[0].toUpperCase() + monthName(ym).slice(1)} <span>${cnt} partida${cnt === 1 ? '' : 's'}</span></h3>`; })() : '';
     const rows = C.G[g.id], open = S.open.has(g.id), conf = S.confirm === 'g:' + g.id;
     const acts = !admin ? '' : conf
       ? `<span class="confirm">¿Borrar esta partida?<button class="btn sm danger" data-delgame="${g.id}">Borrar</button><button class="btn sm" data-act="noconfirm">No</button></span>`
       : `<button class="btn sm ghost" data-editgame="${g.id}">Editar</button><button class="btn sm ghost" data-ask="g:${g.id}">Borrar</button>`;
     const shareB = `<button class="btn sm ghost gshare" data-shareg="${g.id}" aria-label="Compartir imagen de la partida ${C.num[g.id]}">Compartir imagen</button>`;
-    return `<article class="panel game ${S.flash===g.id?'fade':''}" id="game-${g.id}">
+    return mh + `<article class="panel game ${S.flash===g.id?'fade':''}" id="game-${g.id}">
       <div class="ghead"><h3>Partida ${C.num[g.id]}</h3><span class="muted">${fmtDate(g.date)}</span>${g.notes ? `<span class="note">· ${esc(g.notes)}</span>` : ''}<span class="ga">${shareB}${acts}</span></div>
       <div class="gl">${rows.map(r => `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x === 'guest' ? '' : f2(r.post)}</span>`).join('')}</div>
       ${(k => !k ? '' : !k.counts ? `<p class="gnote">No cuenta para el Elo: ${k.socios} miembro${k.socios===1?'':'s'} en la mesa, se necesitan mínimo ${MIN_SOCIOS}.</p>` : k.guests ? `<p class="gnote">Con invitado${k.guests===1?'':'s'}: el Elo se calculó solo entre los miembros.</p>` : '')(C.CNT[g.id])}
@@ -1352,7 +1385,7 @@ function vPartidas() {
       ${open ? duelsHtml(rows.filter(r => !r.x)) : ''}`}
     </article>`;
   }).join('');
-  return head + `<div class="stack">${cards}</div>`;
+  return head + bar + pager + `<div class="stack">${cards}</div>` + pager;
 }
 function duelsHtml(rows) {
   const lines = [];
@@ -1362,7 +1395,7 @@ function duelsHtml(rows) {
 }
 
 /* ===== Versión de la página y actualización ===== */
-const APP_VERSION = '2026-11-22.6';
+const APP_VERSION = '2026-11-22.8';
 let NEWVER = false;
 async function checkVersion() {
   if (location.protocol === 'file:' || NEWVER) return;
@@ -1726,7 +1759,7 @@ function tScore(t, keys) {
   }));
   return st;
 }
-const tRank = rows => rows.sort((a, b) => b.wins - a.wins || b.vp - a.vp || b.pct - a.pct || (playerById(a.id)?.name || '').localeCompare(playerById(b.id)?.name || '', 'es'));
+const tRank = rows => rows.sort((a, b) => b.wins - a.wins || b.vp - a.vp || Math.round((b.pct - a.pct) * 1e6) || (playerById(a.id)?.name || '').localeCompare(playerById(b.id)?.name || '', 'es'));
 const tGroupKeys = (t, group) => tPhases(t).filter(p => p.group === group).map(p => p.key);
 const tDone = (t, keys) => keys.length > 0 && keys.every(k => { const tb = tTables(t, k); return tb.length > 0 && tb.every(x => gById(x.g)); });
 function tAutoAdv(t, group) {
@@ -2178,6 +2211,7 @@ document.addEventListener('click', async e => {
   if (ds.go) return go(ds.go);
   if (ds.rk) { S.rk = ds.rk; render(); return; }
   if (ds.cmpwith) { const a = ds.cmpwith; go('cronicas'); S.cmpA = a; if (S.cmpB === a) S.cmpB = ''; render(); goAnchor('cron-cmp'); return; }
+  if (ds.gpage) { S.gPage = +ds.gpage; render(); const f = document.getElementById('gfilt'); if (f) { const hh = (document.querySelector('header.top') || {}).offsetHeight || 120, top = f.getBoundingClientRect().top + window.scrollY - hh - 10; window.scrollTo(0, Math.max(0, top)); } return; }
   if (ds.shareg) { try { await shareGame(ds.shareg); } catch (er) { toast('No se pudo crear la imagen.'); } return; }
   if (ds.sharet) { try { await shareTour(ds.sharet); } catch (er) { toast('No se pudo crear la imagen.'); } return; }
   if (ds.editseason && isAdmin()) { S.sEdit = ds.editseason; S.confirm = null; render(); setTimeout(() => document.getElementById('sform')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 0); return; }
@@ -2327,6 +2361,7 @@ document.addEventListener('click', async e => {
   }
   switch (ds.act) {
     case 'noconfirm': S.confirm = null; render(); break;
+    case 'gfclear': S.gf = { y: '', m: '', p: '' }; S.gPage = 1; render(); break;
     case 'cancel-edit': case 'clear-draft': if (S.draft?.pUrl) URL.revokeObjectURL(S.draft.pUrl); S.draft = newDraft(); render(); break;
     case 'copyshare': { const ta = document.getElementById('share-text'); const txt = S.shareOut || ''; const sel = () => { if (ta) { ta.focus(); ta.select(); } };
       try { navigator.clipboard.writeText(txt).then(() => toast('Copiado. Pégalo en WhatsApp.'), () => { sel(); toast('Mantén presionado el texto y copia.'); }); } catch (e) { sel(); toast('Mantén presionado el texto y copia.'); } break; }
@@ -2441,6 +2476,7 @@ document.addEventListener('change', e => {
 document.addEventListener('input', e => {
   const t = e.target;
   if (t.dataset && t.dataset.bulk && S.bulkDel) { t.checked ? S.bulkDel.add(t.dataset.bulk) : S.bulkDel.delete(t.dataset.bulk); S.confirm = null; const y = window.scrollY; render(); window.scrollTo(0, y); return; }
+  if (t.id === 'gf-y' || t.id === 'gf-m' || t.id === 'gf-p') { const F = S.gf || (S.gf = { y: '', m: '', p: '' }); F[t.id.slice(3)] = t.value; S.gPage = 1; t.blur(); const y = window.scrollY; render(); window.scrollTo(0, y); return; }
   if (t.id === 'cron-month') { S.cronMonth = t.value; t.blur(); const y = window.scrollY; render(); window.scrollTo(0, y); return; }
   if (t.id === 'cmp-a' || t.id === 'cmp-b') { if (t.id === 'cmp-a') S.cmpA = t.value; else S.cmpB = t.value; t.blur(); const y = window.scrollY; render(); window.scrollTo(0, y); return; }
   if (t.id === 'tme') { const tt = tById(S.tSel); if (tt) { (S.tMe ||= {})[tt.id] = t.value; try { localStorage.setItem(tMeKey(tt), t.value); } catch (er) {} t.blur(); const y = window.scrollY; render(); window.scrollTo(0, y); } return; }
