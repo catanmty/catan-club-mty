@@ -91,6 +91,11 @@ main{padding-block:20px 64px}
 .sec-head p{margin:2px 0 0;color:var(--muted);font-size:13.5px;max-width:60ch}
 .stack{display:flex;flex-direction:column;gap:14px}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.meter{margin:10px 0 2px}.meter .mt{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:5px}.meter .mt b{font-weight:600}.meter .mt span{font-family:var(--f-mono);font-size:13px;color:var(--muted);white-space:nowrap}
+.meter .bar{height:10px;border-radius:5px;background:var(--surface-2);overflow:hidden}.meter .bar i{display:block;height:100%;border-radius:5px;background:var(--up)}.meter .bar i.mid{background:var(--wheat)}.meter .bar i.hi{background:var(--down)}
+.meter .ms{font-size:12.5px;color:var(--muted);margin-top:4px}
+.autobk{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--surface-2);font-size:14px}
+.autobk a.btn{text-decoration:none;color:var(--ink)}
 .pad{padding:16px}
 .panel h3{font-size:18px;margin-bottom:4px}
 
@@ -692,7 +697,7 @@ function playerStats(id, CC = C) {
   const peak = Math.max(cfg.base, ...h.map(x => x.post));
   const avgPos = h.length ? h.reduce((s,x) => s + x.place, 0) / h.length : null;
   const avgVp = h.length ? h.reduce((s,x) => s + x.vp, 0) / h.length : null;
-  const last = h.length ? r0(h[h.length-1].post - h[h.length-1].pre) : null;
+  const last = h.length ? h[h.length-1].post - h[h.length-1].pre : null;
   const pl = [1,2,3,4].map(p => h.filter(x => x.place === p).length);
   const colors = {};
   h.forEach(x => { if (!x.color) return; const o = colors[x.color] ||= { n: 0, w: 0 }; o.n++; if (x.place === 1) o.w++; });
@@ -830,10 +835,55 @@ async function pendClean() {
   for (let i = 0; i < old.length; i += 100) await api('/storage/v1/object/fotos', { method: 'DELETE', body: { prefixes: old.slice(i, i + 100) } });
   return { total: L.length, del: old.length };
 }
+/* ===== Respaldo automático y espacio ===== */
+const SPACE_FREE = { fotos: 1024 ** 3, db: 500 * 1024 ** 2 };
+const fmtMB = b => b >= 1024 ** 3 ? (b / 1024 ** 3).toFixed(2) + ' GB' : b >= 100 * 1024 ** 2 ? Math.round(b / 1024 ** 2) + ' MB' : (b / 1024 ** 2).toFixed(1) + ' MB';
+function autoBkHtml() {
+  const A = S.autoBk;
+  if (!A || A === 'loading') return '<div class="autobk muted">Revisando el respaldo automático…</div>';
+  if (A === 'none') return '<div class="autobk">Todavía no hay respaldo automático. Se activa al agregar el archivo <b>respaldo-automatico.yml</b> en GitHub.</div>';
+  const age = Math.floor((Date.now() - Date.parse(A.fecha)) / 864e5);
+  return `<div class="autobk"><b>Respaldo automático:</b> último el ${fmtDate(localDay(Date.parse(A.fecha)))}${age >= 1 ? ` (hace ${age} día${age === 1 ? '' : 's'})` : ''}, con ${A.players} jugadores y ${A.games} partidas. Se revisa todos los días y guarda una copia nueva cuando hay cambios.${age > 3 ? ' <b>Lleva varios días sin copia nueva.</b> Si sí hubo partidas, revisa en GitHub la pestaña Actions.' : ''}
+    <div class="tacts" style="margin-top:8px"><a class="btn sm" href="respaldos/ultimo.json" download="respaldo-automatico-${A.fecha.slice(0, 10)}.json">Descargar el último respaldo automático</a></div></div>`;
+}
+async function loadAutoBk() {
+  try {
+    const r = await fetch('respaldos/ultimo.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw 0; const o = await r.json();
+    S.autoBk = o && o.fecha && o.datos ? { fecha: o.fecha, players: (o.datos.players || []).length, games: (o.datos.games || []).length } : 'none';
+  } catch (e) { S.autoBk = 'none'; }
+  const el = document.getElementById('autobk'); if (el) el.innerHTML = autoBkHtml();
+}
+function meterHtml(label, used, cap, extra) {
+  const pc = Math.min(100, used / cap * 100), cls = pc >= 90 ? 'hi' : pc >= 70 ? 'mid' : '';
+  return `<div class="meter"><div class="mt"><b>${label}</b><span>${fmtMB(used)} de ${fmtMB(cap)} · ${pc < 1 ? '<1' : Math.round(pc)}%</span></div><div class="bar" role="meter" aria-label="${label}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pc)}"><i class="${cls}" style="width:${Math.max(pc, 0.8)}%"></i></div>${extra ? `<div class="ms">${extra}</div>` : ''}</div>`;
+}
+function spaceHtml() {
+  const U = S.space;
+  if (!U || U === 'loading') return '<p class="muted" style="margin:6px 0 0">Calculando…</p>';
+  if (U === 'off') return '<div class="warn" style="margin-top:8px">El medidor todavía no está activado. Falta correr una vez el archivo <b>supabase-medidor-de-espacio.sql</b> en Supabase, en SQL Editor.</div>';
+  if (U === 'err') return '<p class="muted" style="margin:6px 0 0">No se pudo revisar el espacio ahorita. Inténtalo más tarde.</p>';
+  const avg = U.fotos_n ? U.fotos_bytes / U.fotos_n : 70 * 1024, left = Math.max(0, Math.floor((SPACE_FREE.fotos - U.fotos_bytes) / avg));
+  const warn = U.fotos_bytes / SPACE_FREE.fotos >= 0.9 || U.db_bytes / SPACE_FREE.db >= 0.9;
+  return meterHtml('Fotos', U.fotos_bytes, SPACE_FREE.fotos, `${U.fotos_n.toLocaleString('es-MX')} foto${U.fotos_n === 1 ? '' : 's'} guardada${U.fotos_n === 1 ? '' : 's'}${U.pend_n ? `, ${U.pend_n} enviada${U.pend_n === 1 ? '' : 's'} por amigos` : ''}. Caben aproximadamente ${left.toLocaleString('es-MX')} más.`)
+    + meterHtml('Datos (jugadores, partidas, torneos)', U.db_bytes, SPACE_FREE.db, 'Incluye lo que Supabase ocupa por dentro, por eso no empieza en cero.')
+    + (warn ? '<div class="warn" style="margin-top:10px">Ya casi se llena. Puedes limpiar fotos sin usar, borrar fotos de partidas viejas o pasar al plan Pro de Supabase (25 dólares al mes).</div>' : '');
+}
+async function loadSpace() {
+  try { const u = await api('/rest/v1/rpc/uso_espacio', { method: 'POST', body: {} }); S.space = u && typeof u.fotos_bytes === 'number' ? u : 'err'; }
+  catch (e) { S.space = e.status === 404 || e.code === 'PGRST202' ? 'off' : 'err'; }
+  const el = document.getElementById('spacebox'); if (el) el.innerHTML = spaceHtml();
+}
+function spacePanel() {
+  if (!S.space) { S.space = 'loading'; setTimeout(loadSpace, 0); }
+  return `<div class="panel pad"><h3>Espacio usado</h3><p class="hint" style="margin:0">Lo que lleva ocupado la liga del plan gratis de Supabase.</p><div id="spacebox">${spaceHtml()}</div>
+    <div class="tacts" style="margin-top:10px"><button class="btn sm ghost" data-act="spacerefresh">Volver a revisar</button></div></div>`;
+}
 function backupPanel() {
-  return `<div class="panel pad"><h3>Respaldo</h3><p class="hint" style="margin:0 0 10px">Descarga una copia de toda la liga. Hazlo de vez en cuando y guárdala en tu Drive o en tu correo: el plan gratis de Supabase no guarda copias.</p>
+  if (!S.autoBk) { S.autoBk = 'loading'; setTimeout(loadAutoBk, 0); }
+  return `<div class="panel pad"><h3>Respaldo</h3><p class="hint" style="margin:0 0 10px">Descarga una copia de toda la liga cuando quieras. Además, GitHub guarda una copia automática.</p>
     <div class="tacts"><button class="btn primary sm" data-act="bkxlsx">Descargar Excel</button><button class="btn sm" data-act="bkjson">Descargar respaldo completo</button></div>
-    <p class="hint" style="margin:8px 0 0">El Excel trae ranking, jugadores, partidas, torneos y bitácora. El respaldo completo es el archivo para restaurar la liga si algo se borra.</p></div>`;
+    <p class="hint" style="margin:8px 0 0">El Excel trae ranking, jugadores, partidas, torneos y bitácora. El respaldo completo es el archivo para restaurar la liga si algo se borra.</p><div id="autobk">${autoBkHtml()}</div></div>`;
 }
 
 /* ===== Imagen para compartir ===== */
@@ -1006,7 +1056,7 @@ async function refreshAdmin() {
   if (S.adminOn) await loadAdmins(); else S.admins = null;
 }
 async function loadAdmins() { try { S.admins = (await api('/rest/v1/admins?select=email&order=email') || []).map(x => x.email); } catch (e) { S.admins = []; } }
-async function logout() { try { const t = await token(); if (t) await authCall('logout', {}, 'POST', t); } catch (e) {} saveSess(null); S.canWrite = false; S.adminOn = false; S.admins = null; }
+async function logout() { try { const t = await token(); if (t) await authCall('logout', {}, 'POST', t); } catch (e) {} saveSess(null); S.canWrite = false; S.adminOn = false; S.admins = null; S.space = null; }
 const ASSETS = {
   async upload(blob) {
     const ty = blob.type || 'image/jpeg', ext = ty.includes('png') ? 'png' : ty.includes('webp') ? 'webp' : 'jpg', path = 'p/' + uid() + '.' + ext;
@@ -1051,18 +1101,18 @@ function vRanking() {
     const lab = ['Primer lugar','Segundo lugar','Tercer lugar'];
     pod = `<div class="podium">${played.slice(0,3).map((x,i) => `<div class="pod ${i===0?'first':''}">
       <div style="min-width:0;flex:1"><div class="pl">${lab[i]}</div><div class="nm">${esc(x.p.name)}</div>${tierHtml(x.s.elo)}</div>
-      <div class="el">${r0(x.s.elo)}</div></div>`).join('')}</div>`;
+      <div class="el">${f2(x.s.elo)}</div></div>`).join('')}</div>`;
   }
   const rows = list.map((x, i) => {
     const prov = x.s.n < cfg.provGames;
     return `<tr class="rowlink" tabindex="0" data-player="${x.p.id}">
       <td class="rank ${x.s.n && i < 3 ? 'top' : ''}">${x.s.n ? i + 1 : '–'}</td>
       <td><div style="min-width:92px"><b>${esc(x.p.name)}</b><br>${x.s.n === 0 ? '<span class="tier">Sin partidas</span>' : prov ? `<span class="prov">Posic. ${x.s.n}/${cfg.provGames}</span>` : tierHtml(x.s.elo)}</div></td>
-      <td class="r elo">${r0(x.s.elo)}</td>
+      <td class="r elo">${f2(x.s.elo)}</td>
       <td class="r num">${x.s.n}</td>
       ${x.s.pl.map((c, j) => `<td class="pc ${j === 0 ? 'p1' : j === 3 ? 'p4' : ''} ${c ? '' : 'z'}">${c}</td>`).join('')}
       <td class="cc">${x.s.fav ? sw(x.s.fav) + `<span class="wide"> ${cname(x.s.fav)}</span>` : '<span class="muted">—</span>'}</td>
-      <td class="r wide">${x.s.last === null ? '<span class="d zero">—</span>' : `<span class="d ${dcls(x.s.last)}">${sgn(x.s.last)}</span>`}</td>
+      <td class="r wide">${x.s.last === null ? '<span class="d zero">—</span>' : `<span class="d ${dcls(rd(x.s.last))}">${sgnD(x.s.last)}</span>`}</td>
       <td class="r wide">${spark(x.s.h)}</td>
     </tr>`;
   }).join('');
@@ -1309,7 +1359,7 @@ function duelsHtml(rows) {
 }
 
 /* ===== Versión de la página y actualización ===== */
-const APP_VERSION = '2026-11-22.3';
+const APP_VERSION = '2026-11-22.5';
 let NEWVER = false;
 async function checkVersion() {
   if (location.protocol === 'file:' || NEWVER) return;
@@ -1401,11 +1451,11 @@ function clubRecords() {
     Object.entries(bym).forEach(([k, v]) => { if (!bestM || v > bestM.v) bestM = { id, v, ym: k }; });
   });
   C.order.forEach(g => (C.G[g.id] || []).forEach(r => { if (!maxVp || r.vp > maxVp.v) maxVp = { id: r.playerId, v: r.vp, date: g.date }; }));
-  if (peak) out.push(['Elo más alto de la historia', peak.id, `${r0(peak.v)}`, `Lo alcanzó el ${fmtDate(peak.date)}`]);
+  if (peak) out.push(['Elo más alto de la historia', peak.id, `${f2(peak.v)}`, `Lo alcanzó el ${fmtDate(peak.date)}`]);
   if (streak) out.push(['Racha más larga de victorias', streak.id, `${streak.v} seguida${streak.v === 1 ? '' : 's'}`, `Terminó el ${fmtDate(streak.date)}`]);
   if (most) out.push(['Más partidas jugadas', most.id, `${most.v}`, 'Partidas que cuentan para el Elo']);
   if (mostW) out.push(['Más victorias', mostW.id, `${mostW.v}`, 'Primeros lugares']);
-  if (bestM && bestM.v > 0) out.push(['Mejor mes', bestM.id, `${sgn(r0(bestM.v))}`, `Elo ganado en ${monthName(bestM.ym)}`]);
+  if (bestM && bestM.v > 0) out.push(['Mejor mes', bestM.id, `${sgnD(bestM.v)}`, `Elo ganado en ${monthName(bestM.ym)}`]);
   if (maxVp) out.push(['Más PV en una partida', maxVp.id, `${maxVp.v} PV`, fmtDate(maxVp.date)]);
   return out;
 }
@@ -1430,7 +1480,7 @@ function vCronicas() {
   const card = (k, v, sub) => `<div class="cstat"><span>${k}</span><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
   const month = `<section class="panel pad cron" id="cron-mes"><div class="cron-h"><h3>Resumen del mes</h3><select class="sel" id="cron-month" aria-label="Elegir mes">${months.map(m => `<option value="${m}" ${m === ym ? 'selected' : ''}>${cap1(monthName(m))}</option>`).join('')}</select></div>
     ${M.games ? `<div class="cstats">${card('Partidas', M.games)}${card('Jugadores activos', M.active)}${card('Nuevos', M.newP, M.newM ? `${M.newM} se hicieron miembros` : 'jugadores dados de alta')}
-      ${M.gain ? card('Subió más', pname(M.gain[0]), `${sgn(r0(M.gain[1]))} de Elo`) : ''}${M.wins ? card('Más victorias', pname(M.wins[0]), `${M.wins[1]} primer${M.wins[1] === 1 ? ' lugar' : 'os lugares'}`) : ''}${M.color ? card('Color ganador', `${sw(M.color[0])} ${cname(M.color[0])}`,`${M.color[1]} victoria${M.color[1] === 1 ? '' : 's'}`) : ''}</div>
+      ${M.gain ? card('Subió más', pname(M.gain[0]), `${sgnD(M.gain[1])} de Elo`) : ''}${M.wins ? card('Más victorias', pname(M.wins[0]), `${M.wins[1]} primer${M.wins[1] === 1 ? ' lugar' : 'os lugares'}`) : ''}${M.color ? card('Color ganador', `${sw(M.color[0])} ${cname(M.color[0])}`,`${M.color[1]} victoria${M.color[1] === 1 ? '' : 's'}`) : ''}</div>
       <div class="tacts" style="margin-top:10px"><button type="button" class="btn sm ghost" data-sharemonth="${ym}">Compartir imagen del mes</button></div>` : `<p class="muted" style="margin:6px 0 0">En ${monthName(ym)} todavía no hay partidas.</p>`}</section>`;
   const rec = clubRecords();
   const records = `<section class="panel pad cron" id="cron-rec"><h3>Récords del club</h3><div class="crecs">${rec.map(([k, id, v, sub]) => `<button type="button" class="crec" data-player="${id}"><span class="k">${k}</span><b>${pname(id)}</b><span class="v">${esc(v)}</span><span class="s">${esc(sub)}</span></button>`).join('')}</div></section>`;
@@ -1442,7 +1492,7 @@ function vCronicas() {
     const d = cmpData(A, B), an = pname(A), bn = pname(B);
     cmpBody = !d.games.length ? `<p class="muted" style="margin:10px 0 0">${an} y ${bn} todavía no han jugado en la misma mesa.</p>` : `
       <div class="cvs"><div class="cvs-p"><b>${an}</b><span class="num">${d.aUp}</span><em>veces arriba</em></div><div class="cvs-m"><span>${d.games.length}</span><em>partida${d.games.length === 1 ? '' : 's'} juntos${d.tie ? ` · ${d.tie} empate${d.tie === 1 ? '' : 's'}` : ''}</em></div><div class="cvs-p r"><b>${bn}</b><span class="num">${d.bUp}</span><em>veces arriba</em></div></div>
-      <p style="margin:10px 0 0">${d.eloA === 0 ? 'Entre ellos van parejos en Elo.' : `${d.eloA > 0 ? an : bn} le ha sacado <b class="d up">${sgn(r0(Math.abs(d.eloA)))}</b> de Elo a ${d.eloA > 0 ? bn : an}.`}</p>
+      <p style="margin:10px 0 0">${rd(d.eloA) === 0 ? 'Entre ellos van parejos en Elo.' : `${d.eloA > 0 ? an : bn} le ha sacado <b class="d up">${sgnD(Math.abs(d.eloA))}</b> de Elo a ${d.eloA > 0 ? bn : an}.`}</p>
       ${d.colA || d.colB ? `<p class="muted" style="margin:6px 0 0">${d.colA ? `${an} le gana más con ${sw(d.colA[0])} ${cname(d.colA[0])}. ` : ''}${d.colB ? `${bn} le gana más con ${sw(d.colB[0])} ${cname(d.colB[0])}.` : ''}</p>` : ''}
       <p class="lbl" style="margin:14px 0 6px">Sus últimas partidas juntos</p>
       <ul class="clist">${d.games.slice(-6).reverse().map(({ g, ra, rb }) => `<li><span class="muted">${fmtDate(g.date)}</span><span>${an} <b>${ra.place}º</b> · ${bn} <b>${rb.place}º</b></span></li>`).join('')}</ul>`;
@@ -1453,7 +1503,7 @@ function vCronicas() {
 async function shareMonth(ym) {
   const M = monthStats(ym); if (!M.games) return;
   const rows = [{ pos: '', name: 'Partidas jugadas', right: String(M.games) }, { pos: '', name: 'Jugadores activos', right: String(M.active) }];
-  if (M.gain) rows.push({ pos: '', name: 'Subió más: ' + (playerById(M.gain[0])?.name || '?'), right: sgn(r0(M.gain[1])).replace('−', '-'), deltaColor: '#2B7A38' });
+  if (M.gain) rows.push({ pos: '', name: 'Subió más: ' + (playerById(M.gain[0])?.name || '?'), right: sgnD(M.gain[1]).replace('−', '-'), deltaColor: '#2B7A38' });
   if (M.wins) rows.push({ pos: '', name: 'Más victorias: ' + (playerById(M.wins[0])?.name || '?'), right: String(M.wins[1]) });
   if (M.color) rows.push({ pos: '', name: 'Color ganador: ' + cname(M.color[0]), color: COLHEX[M.color[0]], right: String(M.color[1]) });
   if (M.newP) rows.push({ pos: '', name: 'Jugadores nuevos', right: String(M.newP) });
@@ -1485,7 +1535,7 @@ function vJugadores() {
   const adm = isAdmin();
   const card = x => { const gp = C.GP[x.p.id] || 0; return x.g
     ? `<button class="pcard guest" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta"><span class="gtag">Invitado</span> ${gp >= GUEST_GAMES ? '<b class="ready">Listo para ser miembro</b>' : `${gp} de ${GUEST_GAMES} partidas`}</span></span><span class="el muted">—</span></button>`
-    : `<button class="pcard" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta">${x.s.n} partida${x.s.n===1?'':'s'} · ${x.s.wins} victoria${x.s.wins===1?'':'s'}</span></span><span class="el">${r0(x.s.elo)}</span></button>`; };
+    : `<button class="pcard" data-player="${x.p.id}">${dot(x.p.id)}<span style="min-width:0"><span class="nm">${esc(x.p.name)}</span><span class="meta">${x.s.n} partida${x.s.n===1?'':'s'} · ${x.s.wins} victoria${x.s.wins===1?'':'s'}</span></span><span class="el">${f2(x.s.elo)}</span></button>`; };
   const bulk = adm && S.bulkDel;
   const item = x => !adm ? card(x) : bulk
     ? (why => `<label class="pcard pbulk ${why ? 'dis' : ''} ${S.bulkDel.has(x.p.id) ? 'on' : ''}"><input type="checkbox" data-bulk="${x.p.id}" ${S.bulkDel.has(x.p.id) ? 'checked' : ''} ${why ? 'disabled' : ''}><span style="min-width:0"><span class="nm">${esc(x.p.name)}${x.g ? ' <span class="gtag sm">Invitado</span>' : ''}</span><span class="meta">${why || 'Se puede borrar'}</span></span></label>`)(pDelWhy(x.p.id))
@@ -1521,8 +1571,8 @@ function vPlayer(id) {
   s.h.forEach(g => g.duels.forEach(d => { const t = riv[d.opp] ||= { w:0, l:0, t:0, net:0 }; if (d.W === 1) t.w++; else if (d.W === 0) t.l++; else t.t++; t.net += d.d; }));
   const anyTie = Object.values(riv).some(t => t.t);
   const rivRows = Object.entries(riv).sort((a,b) => (b[1].w+b[1].l+b[1].t) - (a[1].w+a[1].l+a[1].t)).map(([o,t]) =>
-    `<tr><td><div class="pname">${dot(o)}${pname(o)}</div></td><td class="r num">${t.w}-${t.l}${anyTie ? '-' + t.t : ''}</td><td class="r"><span class="d ${dcls(Math.round(t.net))}">${sgn(r0(t.net))}</span></td></tr>`).join('');
-  const hist = [...s.h].reverse().map(g => { const dd = rd(g.post - g.pre, 1); return `<tr><td class="num">${g.num}</td><td>${fmtDate(g.date)}</td><td class="cc">${sw(g.color)}</td><td class="r num">${g.place}º<span class="muted">/${g.size}</span></td><td class="r num">${g.vp}</td><td class="r"><span class="d ${dcls(dd)}">${sgnD(dd, 1)}</span></td><td class="r num">${r0(g.post)}</td></tr>`; }).join('');
+    `<tr><td><div class="pname">${dot(o)}${pname(o)}</div></td><td class="r num">${t.w}-${t.l}${anyTie ? '-' + t.t : ''}</td><td class="r"><span class="d ${dcls(rd(t.net))}">${sgnD(t.net)}</span></td></tr>`).join('');
+  const hist = [...s.h].reverse().map(g => { const dd = rd(g.post - g.pre); return `<tr><td class="num">${g.num}</td><td>${fmtDate(g.date)}</td><td class="cc">${sw(g.color)}</td><td class="r num">${g.place}º<span class="muted">/${g.size}</span></td><td class="r num">${g.vp}</td><td class="r"><span class="d ${dcls(dd)}">${sgnD(dd)}</span></td><td class="r num">${f2(g.post)}</td></tr>`; }).join('');
   const colRows = Object.entries(s.colors).sort((a,b) => b[1].n - a[1].n || b[1].w - a[1].w).map(([k,o]) =>
     `<tr><td class="cc">${sw(k)} ${cname(k)}</td><td class="r num">${o.n}</td><td class="r num">${o.w}</td><td class="r num">${Math.round(o.w / o.n * 100)}%</td></tr>`).join('');
   const pct = c => s.n ? `<span class="muted" style="font-size:13px"> ${Math.round(c / s.n * 100)}%</span>` : '';
@@ -1535,11 +1585,11 @@ function vPlayer(id) {
   ${manage}${guestPanel(id)}
   <div class="stack" style="margin-top:16px" ${isGuest(id) ? 'hidden' : ''}>
     <div class="stats">
-      <div class="stat"><div class="k">${seasons().length ? 'Elo general' : 'Elo actual'}</div><div class="v big">${r0(s.elo)}</div></div>
+      <div class="stat"><div class="k">${seasons().length ? 'Elo general' : 'Elo actual'}</div><div class="v big">${f2(s.elo)}</div></div>
       ${(cs => { if (!cs) return ''; const ss = playerStats(id, seasonC(cs)); const rk = players().filter(q => !isGuest(q.id)).map(q => ({ id: q.id, s: playerStats(q.id, seasonC(cs)) })).filter(x => x.s.n > 0).sort((a, b) => b.s.elo - a.s.elo).findIndex(x => x.id === id);
-        return `<div class="stat"><div class="k">Elo ${esc(cs.name)}</div><div class="v big">${r0(ss.elo)}</div><div class="muted" style="font-size:12px">${ss.n ? `${rk + 1}º · ${ss.n} partida${ss.n === 1 ? '' : 's'}` : 'Sin partidas en la temporada'}</div></div>`; })(curSeason())}
+        return `<div class="stat"><div class="k">Elo ${esc(cs.name)}</div><div class="v big">${f2(ss.elo)}</div><div class="muted" style="font-size:12px">${ss.n ? `${rk + 1}º · ${ss.n} partida${ss.n === 1 ? '' : 's'}` : 'Sin partidas en la temporada'}</div></div>`; })(curSeason())}
       <div class="stat"><div class="k">Lugar</div><div class="v">${rank >= 0 ? rank + 1 + 'º' : '—'}</div></div>
-      <div class="stat"><div class="k">Elo máximo</div><div class="v">${r0(s.peak)}</div></div>
+      <div class="stat"><div class="k">Elo máximo</div><div class="v">${f2(s.peak)}</div></div>
       <div class="stat"><div class="k">Partidas</div><div class="v">${s.n}</div></div>
       <div class="stat"><div class="k">1er lugar</div><div class="v">${s.pl[0]}${pct(s.pl[0])}</div></div>
       <div class="stat"><div class="k">2º lugar</div><div class="v">${s.pl[1]}${pct(s.pl[1])}</div></div>
@@ -1553,7 +1603,7 @@ function vPlayer(id) {
     <div class="tacts" style="margin:0 0 12px"><button type="button" class="btn sm ghost" data-cmpwith="${id}">Comparar con otro jugador</button></div>
     ${(() => { const L = Object.entries(riv).map(([o, t]) => ({ o, n: t.w + t.l + t.t, net: t.net, w: t.w, l: t.l })).filter(x => x.n >= 2); if (!L.length) return '';
       const best = [...L].sort((a, b) => b.net - a.net)[0], worst = [...L].sort((a, b) => a.net - b.net)[0];
-      return `<div class="grid2 rivhl">${best.net > 0 ? `<div class="panel pad"><p class="lbl">Su cliente favorito</p><p class="rivn">${pname(best.o)}</p><p class="muted" style="margin:0">Le gana ${best.w} de ${best.n} y le ha sacado <b class="d up">${sgn(r0(best.net))}</b> de Elo.</p></div>` : ''}${worst.net < 0 && worst.o !== best.o ? `<div class="panel pad"><p class="lbl">Su némesis</p><p class="rivn">${pname(worst.o)}</p><p class="muted" style="margin:0">Le gana ${worst.l} de ${worst.n} y le ha quitado <b class="d down">${sgn(r0(worst.net))}</b> de Elo.</p></div>` : ''}</div>`; })()}
+      return `<div class="grid2 rivhl">${best.net > 0 ? `<div class="panel pad"><p class="lbl">Su cliente favorito</p><p class="rivn">${pname(best.o)}</p><p class="muted" style="margin:0">Le gana ${best.w} de ${best.n} y le ha sacado <b class="d up">${sgnD(best.net)}</b> de Elo.</p></div>` : ''}${worst.net < 0 && worst.o !== best.o ? `<div class="panel pad"><p class="lbl">Su némesis</p><p class="rivn">${pname(worst.o)}</p><p class="muted" style="margin:0">Le gana ${worst.l} de ${worst.n} y le ha quitado <b class="d down">${sgnD(worst.net)}</b> de Elo.</p></div>` : ''}</div>`; })()}
     <div class="panel pad"><p class="lbl">Evolución del Elo</p>${s.n ? `<div class="chart" data-chart="${id}"></div>` : `<p class="muted" style="margin:0">Aún no juega ninguna partida registrada.</p>`}</div>
     ${s.n ? `<div class="grid2">
       <div class="panel"><div class="pad" style="padding-bottom:0"><p class="lbl">Contra cada rival</p></div><div class="tbl-wrap"><table><thead><tr><th>Rival</th><th class="r">G-P${anyTie?'-E':''}</th><th class="r">Elo neto</th></tr></thead><tbody>${rivRows}</tbody></table></div></div>
@@ -1578,7 +1628,7 @@ function drawChart(el) {
   const pts = vals.map((v,i) => [X(i), Y(v)]);
   const line = pts.map((p,i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
   const area = line + ` L${pts[pts.length-1][0].toFixed(1)} ${H - B} L${pts[0][0].toFixed(1)} ${H - B} Z`;
-  const dots = vals.length <= 40 ? pts.slice(1).map((p,i) => `<circle cx="${p[0]}" cy="${p[1]}" r="2.6" style="fill:var(--surface);stroke:var(--sea)" stroke-width="1.5"><title>Partida ${h[i].num}: ${r0(h[i].post)}</title></circle>`).join('') : '';
+  const dots = vals.length <= 40 ? pts.slice(1).map((p,i) => `<circle cx="${p[0]}" cy="${p[1]}" r="2.6" style="fill:var(--surface);stroke:var(--sea)" stroke-width="1.5"><title>Partida ${h[i].num}: ${f2(h[i].post)}</title></circle>`).join('') : '';
   const end = pts[pts.length - 1];
   const xl = `<text x="${L}" y="${H - 7}" font-size="11" style="fill:var(--muted)">Inicio</text><text x="${W - Rt}" y="${H - 7}" text-anchor="end" font-size="11" style="fill:var(--muted)">${h.length} partida${h.length===1?'':'s'}</text>`;
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Evolución del Elo">${grid}${bl}<path d="${area}" style="fill:var(--sea)" fill-opacity=".1"/><path d="${line}" fill="none" style="stroke:var(--sea)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>${dots}<circle cx="${end[0]}" cy="${end[1]}" r="4.5" style="fill:var(--sea)"/>${xl}</svg>`;
@@ -1934,7 +1984,7 @@ function vFormula() {
     <div class="formula" style="margin-top:8px">ajuste = K × (W − E)</div>
     <p style="margin-top:12px">W vale 1 si quedaste arriba de ese rival, 0.5 si empataron y 0 si quedaste abajo. Se suman los ajustes contra todos tus rivales y ese es tu cambio de Elo de la partida${S.data.cfg.cap > 0 ? `, con un tope de ±${S.data.cfg.cap} puntos` : ''}.</p>
     <p><b>Ejemplo de Catan Universe:</b> A (1000), B (800) y C (1200) quedan 1º, 2º y 3º. A suma +1.92 contra B y +6.08 contra C, total <b>+8.00</b>. B resta −1.92 contra A y suma +7.27 contra C, total <b>+5.35</b>. C resta −6.08 y −7.27, total <b>−13.35</b>.</p>
-    <p>Los ajustes se calculan con decimales y no se redondean, igual que en Catan Universe. En el ranking el Elo se ve redondeado para que se lea fácil, y en cada partida se ven los decimales.</p>
+    <p>Los ajustes se calculan con decimales y no se redondean, igual que en Catan Universe. En toda la página el Elo y sus cambios se muestran con dos decimales.</p>
     <p class="muted" style="margin:0">Las partidas se reprocesan en orden de fecha cada vez que algo cambia, así que una partida atrasada o una corrección deja el ranking consistente.</p>
   </div>
   <div class="panel pad">
@@ -2014,6 +2064,7 @@ function vAdmin() {
     ${seasonsPanel()}
     ${backupPanel()}
     ${restorePanel()}
+    ${spacePanel()}
     ${pendPanel()}
     ${logPanel()}
     <div class="panel pad"><h3>Admins</h3><p class="hint" style="margin:0 0 6px">Quien esté en esta lista puede registrar, editar y borrar. Cada quien entra con su propio correo y contraseña.</p>
@@ -2279,7 +2330,8 @@ document.addEventListener('click', async e => {
       RESTORE = null;
       await commit(d => { d.players = JSON.parse(JSON.stringify(R.data.players)); d.games = JSON.parse(JSON.stringify(R.data.games)); d.champions = JSON.parse(JSON.stringify(R.data.champions)); const log = d.cfg.log || []; d.cfg = { ...DEF, ...JSON.parse(JSON.stringify(R.data.cfg)) }; d.cfg.log = [...log]; }, { ok: 'Listo, la liga quedó como en el respaldo.', log: `Restauró el respaldo del ${R.when}`, tab: 'admin' });
       break; }
-    case 'pendclean': { if (!isAdmin() || S.busy) break; S.busy = true; toast('Revisando fotos…', true); try { const r = await pendClean(); toast(r.del ? `Listo: se ${r.del === 1 ? 'borró 1 foto' : `borraron ${r.del} fotos`} sin usar.` : 'No hay fotos viejas sin usar.'); } catch (er) { toast('No se pudo revisar. Inténtalo más tarde.'); } S.busy = false; break; }
+    case 'spacerefresh': { S.space = 'loading'; const el = document.getElementById('spacebox'); if (el) el.innerHTML = spaceHtml(); loadSpace(); break; }
+    case 'pendclean': { if (!isAdmin() || S.busy) break; S.busy = true; toast('Revisando fotos…', true); try { const r = await pendClean(); if (r.del && S.space && S.space !== 'loading') { S.space = 'loading'; loadSpace(); } toast(r.del ? `Listo: se ${r.del === 1 ? 'borró 1 foto' : `borraron ${r.del} fotos`} sin usar.` : 'No hay fotos viejas sin usar.'); } catch (er) { toast('No se pudo revisar. Inténtalo más tarde.'); } S.busy = false; break; }
     case 'bkxlsx': try { saveBlob(xlsxBlob(backupSheets()), `liga-catan-club-mty-${today()}.xlsx`); toast('Excel descargado.'); } catch (er) { toast('No se pudo crear el Excel.'); } break;
     case 'bkjson': try { saveBlob(new Blob([JSON.stringify({ liga: 'Catan Club MTY', fecha: new Date().toISOString(), datos: S.data }, null, 1)], { type: 'application/json' }), `respaldo-liga-catan-club-mty-${today()}.json`); toast('Respaldo descargado.'); } catch (er) { toast('No se pudo crear el respaldo.'); } break;
     case 'bulkon': S.bulkDel = new Set(); S.inlineEdit = null; S.confirm = null; render(); break;
