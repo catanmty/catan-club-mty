@@ -589,6 +589,9 @@ const fmtDate = s => { if (!s) return ''; const [y,m,d] = s.split('-').map(Numbe
 const r0 = x => Math.round(x);
 const sgn = n => n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '±0';
 const dcls = n => n > 0 ? 'up' : n < 0 ? 'down' : 'zero';
+const rd = (x, d = 2) => Math.round(x * 10 ** d) / 10 ** d;
+const f2 = x => rd(x).toFixed(2);
+const sgnD = (x, d = 2) => { const v = rd(x, d); return v > 0 ? `+${v.toFixed(d)}` : v < 0 ? `−${Math.abs(v).toFixed(d)}` : '±0'; };
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
 const tierOf = e => { let t = TIERS[0]; for (const x of TIERS) if (e >= x[0]) t = x; return t; };
 const tierHtml = e => { const t = tierOf(e); return `<span class="tier"><svg class="hx" viewBox="0 0 24 24" style="fill:${t[2]}">${HEX}</svg>${t[1]}</span>`; };
@@ -627,7 +630,7 @@ function socioAt(cfg, id, g) {
   return g.date !== jd ? g.date > jd : (g.createdAt || Date.now()) >= j;
 }
 const gtag = (id, extra = '') => isGuest(id) ? `<span class="gtag ${extra}">Invitado</span>` : '';
-const dcell = r => r.x === 'guest' ? '<span class="d gx">Invitado</span>' : r.x === 'nocount' ? '<span class="d zero">No cuenta</span>' : (dd => `<span class="d ${dcls(dd)}">${sgn(dd)}</span>`)(r0(r.post) - r0(r.pre));
+const dcell = r => r.x === 'guest' ? '<span class="d gx">Invitado</span>' : r.x === 'nocount' ? '<span class="d zero">No cuenta</span>' : (dd => `<span class="d ${dcls(rd(dd))}">${sgnD(dd)}</span>`)(r.post - r.pre);
 
 /* ===== Elo engine: replay every game in date order from the base rating ===== */
 function compute(ps, games, cfg) {
@@ -656,7 +659,7 @@ function compute(ps, games, cfg) {
         if (o === r) continue;
         const W = score(r) > score(o) ? 1 : score(r) < score(o) ? 0 : 0.5;
         const E = 1 / (1 + Math.pow(10, (pre[o.playerId] - pre[r.playerId]) / 400));
-        const d = cfg.perRival ? Math.round(k * (W - E)) : k * (W - E); delta += d;
+        const d = k * (W - E); delta += d;
         duels.push({ opp: o.playerId, W, E, d });
       }
       const raw = delta;
@@ -689,7 +692,7 @@ function playerStats(id, CC = C) {
   const peak = Math.max(cfg.base, ...h.map(x => x.post));
   const avgPos = h.length ? h.reduce((s,x) => s + x.place, 0) / h.length : null;
   const avgVp = h.length ? h.reduce((s,x) => s + x.vp, 0) / h.length : null;
-  const last = h.length ? r0(h[h.length-1].post) - r0(h[h.length-1].pre) : null;
+  const last = h.length ? r0(h[h.length-1].post - h[h.length-1].pre) : null;
   const pl = [1,2,3,4].map(p => h.filter(x => x.place === p).length);
   const colors = {};
   h.forEach(x => { if (!x.color) return; const o = colors[x.color] ||= { n: 0, w: 0 }; o.n++; if (x.place === 1) o.w++; });
@@ -791,14 +794,14 @@ function backupSheets() {
   const pn = id => playerById(id)?.name || '(borrado)';
   const jug = [['Jugador', 'Tipo', 'Elo general', 'Partidas que cuentan', 'Partidas jugadas', '1º', '2º', '3º', '4º', 'Miembro desde', 'Dado de alta']];
   [...players()].sort((a, b) => a.name.localeCompare(b.name, 'es')).forEach(p => { const s = playerStats(p.id), j = (S.data.cfg.joined || {})[p.id];
-    jug.push([p.name, isGuest(p.id) ? 'Invitado' : 'Miembro', Math.round(s.elo), s.n, C.P[p.id] || 0, ...s.pl, j ? localDay(j) : '', p.createdAt ? localDay(p.createdAt) : '']); });
+    jug.push([p.name, isGuest(p.id) ? 'Invitado' : 'Miembro', rd(s.elo), s.n, C.P[p.id] || 0, ...s.pl, j ? localDay(j) : '', p.createdAt ? localDay(p.createdAt) : '']); });
   const par = [['Partida #', 'Fecha', 'Notas', 'Jugador', 'Lugar', 'PV', 'Color', 'Elo antes', 'Elo después', 'Cambio', 'Cuenta para Elo', 'Registró']];
-  C.order.forEach(g => (C.G[g.id] || []).forEach(r => par.push([C.num[g.id], g.date, g.notes || '', pn(r.playerId), r.place, r.vp, r.color ? cname(r.color) : '', r.x === 'guest' ? '' : Math.round(r.pre), r.x === 'guest' ? '' : Math.round(r.post), r.x ? 0 : Math.round(r.post) - Math.round(r.pre), r.x === 'guest' ? 'Invitado' : r.x === 'nocount' ? 'No (menos de 3 miembros)' : 'Sí', g.createdBy || ''])));
+  C.order.forEach(g => (C.G[g.id] || []).forEach(r => par.push([C.num[g.id], g.date, g.notes || '', pn(r.playerId), r.place, r.vp, r.color ? cname(r.color) : '', r.x === 'guest' ? '' : rd(r.pre), r.x === 'guest' ? '' : rd(r.post), r.x ? 0 : rd(r.post - r.pre), r.x === 'guest' ? 'Invitado' : r.x === 'nocount' ? 'No (menos de 3 miembros)' : 'Sí', g.createdBy || ''])));
   const rk = [['Lugar', 'Jugador', 'Elo', 'Rango', 'Partidas']];
-  players().filter(p => !isGuest(p.id)).map(p => ({ p, s: playerStats(p.id) })).filter(x => x.s.n).sort((a, b) => b.s.elo - a.s.elo).forEach((x, i) => rk.push([i + 1, x.p.name, Math.round(x.s.elo), tierOf(x.s.elo)[1], x.s.n]));
+  players().filter(p => !isGuest(p.id)).map(p => ({ p, s: playerStats(p.id) })).filter(x => x.s.n).sort((a, b) => b.s.elo - a.s.elo).forEach((x, i) => rk.push([i + 1, x.p.name, rd(x.s.elo), tierOf(x.s.elo)[1], x.s.n]));
   const sheets = [{ name: 'Ranking general', rows: rk, widths: [8, 28, 8, 14, 10] }];
   seasons().forEach(s => { const CC = seasonC(s), rows = [['Lugar', 'Jugador', 'Elo', 'Partidas']];
-    players().filter(p => !isGuest(p.id)).map(p => ({ p, s: playerStats(p.id, CC) })).filter(x => x.s.n).sort((a, b) => b.s.elo - a.s.elo).forEach((x, i) => rows.push([i + 1, x.p.name, Math.round(x.s.elo), x.s.n]));
+    players().filter(p => !isGuest(p.id)).map(p => ({ p, s: playerStats(p.id, CC) })).filter(x => x.s.n).sort((a, b) => b.s.elo - a.s.elo).forEach((x, i) => rows.push([i + 1, x.p.name, rd(x.s.elo), x.s.n]));
     sheets.push({ name: ('Ranking ' + s.name).replace(/[\[\]:*?\/\\]/g, ' ').slice(0, 31), rows, widths: [8, 28, 8, 10] }); });
   const tor = [['Torneo', 'Fecha', 'Formato', 'Participantes', 'Ganador', 'Premios', 'Descripción']];
   tours().forEach(t => { const f = tFmt(t); tor.push([t.name, t.date, f.qual === 'rondas' ? `${f.rounds} rondas, pasan ${f.qualAdv}` : f.qual === 'eliminatoria' ? `Eliminatoria, pasan ${f.perTable} por mesa` : 'Sin clasificatoria', tParts(t).length, t.winner || '', (t.prizes || '').replace(/\n/g, ' · '), t.desc || '']); });
@@ -868,7 +871,7 @@ async function shareGame(gid) {
   const g = S.data.games.find(x => x.id === gid), rows = C.G[gid]; if (!g || !rows) return;
   const k = C.CNT[gid] || { counts: true };
   await shareCard({ title: `Partida #${C.num[gid]}`, sub: `${fmtDate(g.date)}${g.notes ? ' · ' + g.notes : ''}`,
-    rows: rows.map(r => { const dd = r.x ? null : Math.round(r.post) - Math.round(r.pre); return { pos: r.place + 'º', name: playerById(r.playerId)?.name || '?', color: COLHEX[r.color], tag: r.x === 'guest' ? 'INVITADO' : '', mid: r.vp + ' PV', right: r.x ? (r.x === 'guest' ? '—' : '±0') : (dd > 0 ? '+' + dd : dd === 0 ? '±0' : '−' + Math.abs(dd)), deltaColor: dd > 0 ? '#2B7A38' : dd < 0 ? '#C2410C' : '#6D5B5C' }; }),
+    rows: rows.map(r => { const dd = r.x ? null : rd(r.post - r.pre); return { pos: r.place + 'º', name: playerById(r.playerId)?.name || '?', color: COLHEX[r.color], tag: r.x === 'guest' ? 'INVITADO' : '', mid: r.vp + ' PV', right: r.x ? (r.x === 'guest' ? '—' : '±0') : (dd > 0 ? '+' + dd.toFixed(2) : dd === 0 ? '±0' : '−' + Math.abs(dd).toFixed(2)), deltaColor: dd > 0 ? '#2B7A38' : dd < 0 ? '#C2410C' : '#6D5B5C' }; }),
     foot: k.counts ? 'catanmty.github.io/catan-club-mty' : 'No cuenta para el Elo: menos de 3 miembros · catanmty.github.io/catan-club-mty', file: `partida-${C.num[gid]}.png` });
 }
 async function shareTour(tid) {
@@ -1272,7 +1275,7 @@ function previewHtml() {
   const rows = c.G['__draft'] || [], k = c.CNT['__draft'] || { counts: true, socios: rows.length, guests: 0 };
   const note = !k.counts ? `<div class="warn">Esta partida se guarda pero <b>no cuenta para el Elo</b>: hay ${k.socios} miembro${k.socios===1?'':'s'} y se necesitan mínimo ${MIN_SOCIOS}.</div>` : k.guests ? `<p class="hint" style="margin:0 0 8px">Los invitados quedan registrados pero no suman ni restan Elo a nadie. El Elo se calcula solo entre los miembros.</p>` : '';
   return `<p class="lbl">${k.counts ? 'Así cambiaría el Elo' : 'Resultado'}</p>${note}<div class="gl">${rows.map(r =>
-    `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x ? '' : `${r0(r.pre)} → ${r0(r.post)}`}</span>`
+    `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x ? '' : `${f2(r.pre)} → ${f2(r.post)}`}</span>`
   ).join('')}</div>`;
 }
 
@@ -1289,7 +1292,7 @@ function vPartidas() {
     const shareB = `<button class="btn sm ghost gshare" data-shareg="${g.id}" aria-label="Compartir imagen de la partida ${C.num[g.id]}">Compartir imagen</button>`;
     return `<article class="panel game ${S.flash===g.id?'fade':''}" id="game-${g.id}">
       <div class="ghead"><h3>Partida ${C.num[g.id]}</h3><span class="muted">${fmtDate(g.date)}</span>${g.notes ? `<span class="note">· ${esc(g.notes)}</span>` : ''}<span class="ga">${shareB}${acts}</span></div>
-      <div class="gl">${rows.map(r => `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x === 'guest' ? '' : r0(r.post)}</span>`).join('')}</div>
+      <div class="gl">${rows.map(r => `<span class="pos ${r.place===1?'p1':''}">${r.place}º</span><span class="pname">${sw(r.color)}${pname(r.playerId)}</span><span class="vp">${r.vp} PV</span>${dcell(r)}<span class="after">${r.x === 'guest' ? '' : f2(r.post)}</span>`).join('')}</div>
       ${(k => !k ? '' : !k.counts ? `<p class="gnote">No cuenta para el Elo: ${k.socios} miembro${k.socios===1?'':'s'} en la mesa, se necesitan mínimo ${MIN_SOCIOS}.</p>` : k.guests ? `<p class="gnote">Con invitado${k.guests===1?'':'s'}: el Elo se calculó solo entre los miembros.</p>` : '')(C.CNT[g.id])}
       ${isAssetId(g.photo) ? `<button type="button" class="gphoto" data-lb="${g.photo}" aria-label="Ver foto del tablero de la partida ${C.num[g.id]}"><img data-photo src="${blobUrl(g.photo)}" alt="Foto del tablero de la partida ${C.num[g.id]}" loading="lazy"></button>` : ''}
       ${C.CNT[g.id] && !C.CNT[g.id].counts ? '' : `<button class="btn sm ghost" style="margin-top:6px;padding-left:0" data-toggle="${g.id}" aria-expanded="${open}">${open ? 'Ocultar cálculo' : 'Ver cálculo'}</button>
@@ -1300,13 +1303,13 @@ function vPartidas() {
 }
 function duelsHtml(rows) {
   const lines = [];
-  rows.forEach(r => r.duels.forEach(d => lines.push(`<tr><td>${pname(r.playerId)}</td><td>${pname(d.opp)}</td><td class="r num">${d.W === 1 ? '1' : d.W === 0 ? '0' : '0.5'}</td><td class="r num">${d.E.toFixed(3)}</td><td class="r num">${+r.k.toFixed(2)}</td><td class="r"><span class="d ${dcls(Math.round(d.d*10))}">${d.d >= 0 ? '+' : '−'}${Math.abs(d.d).toFixed(1)}</span></td></tr>`)));
-  const capped = rows.filter(r => r.capped).map(r => `${pname(r.playerId)} (${r.raw >= 0 ? '+' : '−'}${Math.abs(r.raw).toFixed(1)} → ${r.delta >= 0 ? '+' : '−'}${Math.abs(r.delta)})`);
+  rows.forEach(r => r.duels.forEach(d => lines.push(`<tr><td>${pname(r.playerId)}</td><td>${pname(d.opp)}</td><td class="r num">${d.W === 1 ? '1' : d.W === 0 ? '0' : '0.5'}</td><td class="r num">${d.E.toFixed(3)}</td><td class="r num">${+r.k.toFixed(2)}</td><td class="r"><span class="d ${dcls(Math.round(d.d*10))}">${d.d >= 0 ? '+' : '−'}${Math.abs(d.d).toFixed(3)}</span></td></tr>`)));
+  const capped = rows.filter(r => r.capped).map(r => `${pname(r.playerId)} (${sgnD(r.raw)} → ${sgnD(r.delta)})`);
   return `<div class="duels tbl-wrap"><table><thead><tr><th>Jugador</th><th>Contra</th><th class="r">W</th><th class="r">E</th><th class="r">K por rival</th><th class="r">Ajuste</th></tr></thead><tbody>${lines.join('')}</tbody></table></div>${capped.length ? `<p class="hint">Se aplicó el tope de ±${S.data.cfg.cap}: ${capped.join(', ')}.</p>` : ''}`;
 }
 
 /* ===== Versión de la página y actualización ===== */
-const APP_VERSION = '2026-11-22.2';
+const APP_VERSION = '2026-11-22.3';
 let NEWVER = false;
 async function checkVersion() {
   if (location.protocol === 'file:' || NEWVER) return;
@@ -1519,7 +1522,7 @@ function vPlayer(id) {
   const anyTie = Object.values(riv).some(t => t.t);
   const rivRows = Object.entries(riv).sort((a,b) => (b[1].w+b[1].l+b[1].t) - (a[1].w+a[1].l+a[1].t)).map(([o,t]) =>
     `<tr><td><div class="pname">${dot(o)}${pname(o)}</div></td><td class="r num">${t.w}-${t.l}${anyTie ? '-' + t.t : ''}</td><td class="r"><span class="d ${dcls(Math.round(t.net))}">${sgn(r0(t.net))}</span></td></tr>`).join('');
-  const hist = [...s.h].reverse().map(g => { const dd = r0(g.post) - r0(g.pre); return `<tr><td class="num">${g.num}</td><td>${fmtDate(g.date)}</td><td class="cc">${sw(g.color)}</td><td class="r num">${g.place}º<span class="muted">/${g.size}</span></td><td class="r num">${g.vp}</td><td class="r"><span class="d ${dcls(dd)}">${sgn(dd)}</span></td><td class="r num">${r0(g.post)}</td></tr>`; }).join('');
+  const hist = [...s.h].reverse().map(g => { const dd = rd(g.post - g.pre, 1); return `<tr><td class="num">${g.num}</td><td>${fmtDate(g.date)}</td><td class="cc">${sw(g.color)}</td><td class="r num">${g.place}º<span class="muted">/${g.size}</span></td><td class="r num">${g.vp}</td><td class="r"><span class="d ${dcls(dd)}">${sgnD(dd, 1)}</span></td><td class="r num">${r0(g.post)}</td></tr>`; }).join('');
   const colRows = Object.entries(s.colors).sort((a,b) => b[1].n - a[1].n || b[1].w - a[1].w).map(([k,o]) =>
     `<tr><td class="cc">${sw(k)} ${cname(k)}</td><td class="r num">${o.n}</td><td class="r num">${o.w}</td><td class="r num">${Math.round(o.w / o.n * 100)}%</td></tr>`).join('');
   const pct = c => s.n ? `<span class="muted" style="font-size:13px"> ${Math.round(c / s.n * 100)}%</span>` : '';
@@ -1928,9 +1931,10 @@ function vFormula() {
       <li><b>Fórmula Elo contra cada rival,</b> usando el Elo que cada quien traía antes de la partida. Ganarle a alguien con más Elo da más puntos que ganarle a alguien con menos:</li>
     </ol>
     <div class="formula">E = 1 / (1 + 10<sup>(R<sub>rival</sub> − R<sub>tú</sub>) / 400</sup>)</div>
-    <div class="formula" style="margin-top:8px">ajuste = K × (W − E)${S.data.cfg.perRival ? '   (redondeado)' : ''}</div>
+    <div class="formula" style="margin-top:8px">ajuste = K × (W − E)</div>
     <p style="margin-top:12px">W vale 1 si quedaste arriba de ese rival, 0.5 si empataron y 0 si quedaste abajo. Se suman los ajustes contra todos tus rivales y ese es tu cambio de Elo de la partida${S.data.cfg.cap > 0 ? `, con un tope de ±${S.data.cfg.cap} puntos` : ''}.</p>
-    <p><b>Ejemplo de Catan Universe:</b> A (1000), B (800) y C (1200) quedan 1º, 2º y 3º. A suma +2 contra B y +6 contra C, total <b>+8</b>. B resta −2 contra A y suma +7 contra C, total <b>+5</b>. C resta −6 y −7, total <b>−13</b>.</p>
+    <p><b>Ejemplo de Catan Universe:</b> A (1000), B (800) y C (1200) quedan 1º, 2º y 3º. A suma +1.92 contra B y +6.08 contra C, total <b>+8.00</b>. B resta −1.92 contra A y suma +7.27 contra C, total <b>+5.35</b>. C resta −6.08 y −7.27, total <b>−13.35</b>.</p>
+    <p>Los ajustes se calculan con decimales y no se redondean, igual que en Catan Universe. En el ranking el Elo se ve redondeado para que se lea fácil, y en cada partida se ven los decimales.</p>
     <p class="muted" style="margin:0">Las partidas se reprocesan en orden de fecha cada vez que algo cambia, así que una partida atrasada o una corrección deja el ranking consistente.</p>
   </div>
   <div class="panel pad">
