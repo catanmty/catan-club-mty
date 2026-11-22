@@ -96,6 +96,9 @@ main{padding-block:20px 64px}
 .meter .ms{font-size:12.5px;color:var(--muted);margin-top:4px}
 .autobk{margin:10px 0 0;padding:10px 12px;border-radius:8px;background:var(--surface-2);font-size:14px}
 .autobk a.btn{text-decoration:none;color:var(--ink)}
+.dkbox{margin:0 0 12px;padding:10px 12px;border-radius:8px;background:var(--surface-2);font-size:14px}
+.dkrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.dkrow input{flex:1 1 160px;min-width:0}
+.dkconf{display:flex;flex-direction:column;gap:8px;width:100%;padding:10px 12px;border:1px solid var(--down);border-radius:8px}.dkconf b{color:var(--down);font-size:14px}.dkconf .row{display:flex;flex-wrap:wrap;gap:8px}.dkconf input{flex:1 1 160px;min-width:0}
 .pad{padding:16px}
 .panel h3{font-size:18px;margin-bottom:4px}
 
@@ -1359,7 +1362,7 @@ function duelsHtml(rows) {
 }
 
 /* ===== Versión de la página y actualización ===== */
-const APP_VERSION = '2026-11-22.5';
+const APP_VERSION = '2026-11-22.6';
 let NEWVER = false;
 async function checkVersion() {
   if (location.protocol === 'file:' || NEWVER) return;
@@ -1380,11 +1383,40 @@ function showUpdateBar() {
 
 /* ===== Restaurar respaldo ===== */
 let RESTORE = null;
+/* ===== Clave de borrado ===== */
+const DK_IT = 210000;
+const b64e = u8 => btoa(String.fromCharCode(...u8));
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function dkHash(pw, salt, it) {
+  const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
+  return b64e(new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: it }, k, 256)));
+}
+async function dkMake(pw) { const salt = crypto.getRandomValues(new Uint8Array(16)); return { v: 1, it: DK_IT, salt: b64e(salt), hash: await dkHash(pw, salt, DK_IT), at: Date.now(), by: (SESS && SESS.email) || '' }; }
+async function dkCheck(pw) { const K = S.data.cfg.delKey; if (!K) return false; if (!pw) return false; try { return (await dkHash(pw, b64d(K.salt), K.it || DK_IT)) === K.hash; } catch (e) { return false; } }
+const dkOn = () => !!(S.data.cfg.delKey && S.data.cfg.delKey.hash);
+const dkInput = id => `<input type="password" id="${id}" class="dkpw" placeholder="Clave de borrado" aria-label="Clave de borrado" autocomplete="off">`;
+async function dkGate(id, what) {
+  const pw = document.getElementById(id)?.value || '';
+  if (!pw) { toast('Escribe la clave de borrado.'); document.getElementById(id)?.focus(); return false; }
+  toast('Revisando la clave…', true);
+  if (await dkCheck(pw)) return true;
+  toast('Clave de borrado incorrecta. No se borró nada.');
+  try { await commit(d => {}, { log: `Intentó ${what} con una clave de borrado incorrecta`, ok: 'Clave de borrado incorrecta. No se borró nada.', tab: 'admin' }); } catch (e) {}
+  return false;
+}
+function dkPanelHtml() {
+  const K = S.data.cfg.delKey;
+  if (!dkOn()) return `<form id="dkform" class="dkbox" autocomplete="off"><b>Primero crea tu clave de borrado.</b> Sin ella estos botones y "Restaurar respaldo" no funcionan. Solo quien sepa la clave podrá usarlos, aunque sea admin. Usa una que no uses en otro lado.
+    <div class="dkrow"><input type="password" id="dk-new" placeholder="Clave nueva (mínimo 6)" aria-label="Clave de borrado nueva" autocomplete="new-password" minlength="6" required><input type="password" id="dk-new2" placeholder="Repite la clave" aria-label="Repite la clave de borrado" autocomplete="new-password" minlength="6" required><button class="btn primary" type="submit">Crear clave</button></div></form>`;
+  const who = K.by ? ` por ${esc(K.by)}` : '';
+  return `<div class="dkbox"><b>Protegido con clave de borrado</b> (creada${who} el ${fmtDate(localDay(K.at))}). Para borrar todo o restaurar un respaldo se pide esa clave.
+    ${S.dkChange ? `<form id="dkchg" class="dkrow" autocomplete="off"><input type="password" id="dk-cur" placeholder="Clave actual" aria-label="Clave de borrado actual" autocomplete="off" required><input type="password" id="dk-new" placeholder="Clave nueva (mínimo 6)" aria-label="Clave de borrado nueva" autocomplete="new-password" minlength="6" required><input type="password" id="dk-new2" placeholder="Repite la nueva" aria-label="Repite la clave nueva" autocomplete="new-password" minlength="6" required><button class="btn primary" type="submit">Cambiar</button><button class="btn" type="button" data-act="dkchgno">Cancelar</button></form>` : `<div class="tacts" style="margin-top:8px"><button class="btn sm ghost" data-act="dkchg">Cambiar clave de borrado</button></div>`}</div>`;
+}
 function restorePanel() {
   const R = RESTORE;
   const info = R ? `<div class="notice" style="margin-top:10px;flex-direction:column;align-items:stretch"><span><b>Respaldo del ${esc(R.when)}</b>: ${R.data.players.length} jugadores, ${R.data.games.length} partidas, ${(R.data.cfg.tournaments || []).length} torneos y ${(R.data.cfg.seasons || []).length} temporadas.</span>
       <span style="margin-top:6px">Hoy la liga tiene ${players().length} jugadores y ${S.data.games.length} partidas. Al restaurar, <b>todo se reemplaza por lo del respaldo</b>. Antes se descarga sola una copia de cómo está hoy, por si acaso.</span>
-      <div class="tacts" style="margin-top:8px">${S.confirm === 'restore' ? '<button class="btn sm danger" data-act="restorego">Sí, reemplazar la liga</button><button class="btn sm" data-act="noconfirm">No</button>' : '<button class="btn sm danger" data-ask="restore">Restaurar este respaldo</button><button class="btn sm ghost" data-act="restorecancel">Cancelar</button>'}</div></div>` : '';
+      <div class="tacts" style="margin-top:8px">${!dkOn() ? '<span class="muted" style="font-size:13.5px">Para restaurar, primero crea la clave de borrado en la sección Borrar todo, al final de Admin.</span><button class="btn sm ghost" data-act="restorecancel">Cancelar</button>' : S.confirm === 'restore' ? `<div class="dkconf"><b>¿Reemplazar toda la liga con este respaldo?</b><div class="row">${dkInput('dk-rs')}<button class="btn sm danger" data-act="restorego">Sí, reemplazar la liga</button><button class="btn sm" data-act="noconfirm">No</button></div></div>` : '<button class="btn sm danger" data-ask="restore">Restaurar este respaldo</button><button class="btn sm ghost" data-act="restorecancel">Cancelar</button>'}</div></div>` : '';
   return `<div class="panel pad"><h3>Restaurar respaldo</h3><p class="hint" style="margin:0 0 10px">Solo para emergencias: si algo se borró por error, carga aquí el archivo de "respaldo completo" que descargaste antes.</p>
     <input type="file" id="rs-file" class="vh" accept=".json,application/json"><label class="btn sm" for="rs-file">Elegir archivo de respaldo</label>${info}</div>`;
 }
@@ -2084,9 +2116,10 @@ function vAdmin() {
       </form>
       <p class="hint">Cambiar estos valores recalcula todo el histórico.</p></div>
     <div class="panel pad danger-zone"><h3>Borrar todo</h3><p class="hint" style="margin:0 0 12px">Para empezar la liga en limpio después de probarla. La contraseña y los ajustes se conservan.</p>
+      ${dkPanelHtml()}
       <div class="actions" style="margin-top:0">
-        ${rz('r:games') ? `<span class="confirm">¿Borrar las ${ng} partidas?<button class="btn sm danger" data-act="reset-games">Sí, borrar</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn danger" data-ask="r:games" ${ng ? '' : 'disabled'}>Borrar todas las partidas</button>`}
-        ${rz('r:all') ? `<span class="confirm">¿Borrar jugadores y partidas?<button class="btn sm danger" data-act="reset-all">Sí, borrar todo</button><button class="btn sm" data-act="noconfirm">No</button></span>` : `<button class="btn danger" data-ask="r:all" ${players().length ? '' : 'disabled'}>Borrar jugadores y partidas</button>`}
+        ${rz('r:games') && dkOn() ? `<div class="dkconf"><b>¿Borrar ${ng === 1 ? 'la única partida' : `las ${ng} partidas`}?</b><div class="row">${dkInput('dk-pw')}<button class="btn sm danger" data-act="reset-games">Sí, borrar</button><button class="btn sm" data-act="noconfirm">No</button></div></div>` : `<button class="btn danger" data-ask="r:games" ${ng && dkOn() ? '' : 'disabled'}>Borrar todas las partidas</button>`}
+        ${rz('r:all') && dkOn() ? `<div class="dkconf"><b>¿Borrar jugadores y partidas?</b><div class="row">${dkInput('dk-pw')}<button class="btn sm danger" data-act="reset-all">Sí, borrar todo</button><button class="btn sm" data-act="noconfirm">No</button></div></div>` : `<button class="btn danger" data-ask="r:all" ${players().length && dkOn() ? '' : 'disabled'}>Borrar jugadores y partidas</button>`}
       </div></div>
     <p class="hint">Sesión iniciada como ${me}. Cualquiera puede ver la liga; solo los correos de la lista de admins pueden guardar cambios.</p>
   </div>`;
@@ -2323,12 +2356,15 @@ document.addEventListener('click', async e => {
     case 'sedcancel': S.sEdit = null; render(); break;
     case 'reload': hardReload(); break;
     case 'restorecancel': RESTORE = null; S.confirm = null; render(); break;
+    case 'dkchg': S.dkChange = true; render(); setTimeout(() => document.getElementById('dk-cur')?.focus(), 0); break;
+    case 'dkchgno': S.dkChange = false; render(); break;
     case 'restorego': {
-      if (!isAdmin() || !RESTORE) break;
+      if (!isAdmin() || !RESTORE || S.busy) break;
+      if (!(await dkGate('dk-rs', 'restaurar un respaldo'))) break;
       const R = RESTORE; S.confirm = null;
       try { saveBlob(new Blob([JSON.stringify({ liga: 'Catan Club MTY', fecha: new Date().toISOString(), datos: S.data }, null, 1)], { type: 'application/json' }), `antes-de-restaurar-${today()}.json`); } catch (er) {}
       RESTORE = null;
-      await commit(d => { d.players = JSON.parse(JSON.stringify(R.data.players)); d.games = JSON.parse(JSON.stringify(R.data.games)); d.champions = JSON.parse(JSON.stringify(R.data.champions)); const log = d.cfg.log || []; d.cfg = { ...DEF, ...JSON.parse(JSON.stringify(R.data.cfg)) }; d.cfg.log = [...log]; }, { ok: 'Listo, la liga quedó como en el respaldo.', log: `Restauró el respaldo del ${R.when}`, tab: 'admin' });
+      await commit(d => { d.players = JSON.parse(JSON.stringify(R.data.players)); d.games = JSON.parse(JSON.stringify(R.data.games)); d.champions = JSON.parse(JSON.stringify(R.data.champions)); const log = d.cfg.log || [], dk = d.cfg.delKey; d.cfg = { ...DEF, ...JSON.parse(JSON.stringify(R.data.cfg)) }; d.cfg.log = [...log]; if (dk) d.cfg.delKey = dk; else delete d.cfg.delKey; }, { ok: 'Listo, la liga quedó como en el respaldo.', log: `Restauró el respaldo del ${R.when}`, tab: 'admin' });
       break; }
     case 'spacerefresh': { S.space = 'loading'; const el = document.getElementById('spacebox'); if (el) el.innerHTML = spaceHtml(); loadSpace(); break; }
     case 'pendclean': { if (!isAdmin() || S.busy) break; S.busy = true; toast('Revisando fotos…', true); try { const r = await pendClean(); if (r.del && S.space && S.space !== 'loading') { S.space = 'loading'; loadSpace(); } toast(r.del ? `Listo: se ${r.del === 1 ? 'borró 1 foto' : `borraron ${r.del} fotos`} sin usar.` : 'No hay fotos viejas sin usar.'); } catch (er) { toast('No se pudo revisar. Inténtalo más tarde.'); } S.busy = false; break; }
@@ -2344,8 +2380,8 @@ document.addEventListener('click', async e => {
     case 'am-reset': S.authMode = 'reset'; render(); break;
     case 'recheck': await refreshAdmin(); render(); toast(S.adminOn ? 'Listo, ya eres admin.' : 'Tu correo todavía no está en la lista de admins.'); break;
     case 'retry': S.mode = 'loading'; render(); await loadData(); break;
-    case 'reset-games': if (isAdmin()) { S.confirm = null; const phs = S.data.games.map(g => g.photo); await commit(d => { d.games = []; }, { ok: 'Se borraron todas las partidas', tab: 'admin', after: () => delAssets(phs) }); } break;
-    case 'reset-all': if (isAdmin()) { S.confirm = null; const phs = S.data.games.map(g => g.photo); await commit(d => { d.games = []; d.players = []; }, { ok: 'Liga reiniciada', tab: 'admin', sel: null, after: () => delAssets(phs) }); } break;
+    case 'reset-games': if (isAdmin() && !S.busy) { if (!(await dkGate('dk-pw', 'borrar todas las partidas'))) break; S.confirm = null; const phs = S.data.games.map(g => g.photo); await commit(d => { d.games = []; }, { ok: 'Se borraron todas las partidas', tab: 'admin', after: () => delAssets(phs) }); } break;
+    case 'reset-all': if (isAdmin() && !S.busy) { if (!(await dkGate('dk-pw', 'borrar jugadores y partidas'))) break; S.confirm = null; const phs = S.data.games.map(g => g.photo); await commit(d => { d.games = []; d.players = []; }, { ok: 'Liga reiniciada', tab: 'admin', sel: null, after: () => delAssets(phs) }); } break;
   }
 });
 document.addEventListener('change', async e => {
@@ -2607,12 +2643,22 @@ document.addEventListener('submit', async e => {
     const ok = await commit(d => { const L = [...(d.cfg.tournaments || [])]; const k = L.findIndex(x => x.id === rec.id); if (k >= 0) L[k] = rec; else L.push(rec); d.cfg.tournaments = L; },
       { ok: old ? 'Torneo actualizado' : `${name} quedó registrado`, tab: 'campeones', after: () => { if (oldPhoto) delAssets([oldPhoto]); } });
     if (ok) { chReset(); S.tForm = false; S.tEdit = null; if (!old) S.tSel = rec.id; render(); }
+  } else if (f.id === 'dkform' || f.id === 'dkchg') {
+    if (!isAdmin()) return;
+    const a = val('dk-new'), b = val('dk-new2');
+    if (a.length < 6) return toast('La clave debe tener mínimo 6 caracteres.');
+    if (a !== b) return toast('Las dos claves no coinciden.');
+    if (f.id === 'dkchg') { toast('Revisando la clave…', true); if (!(await dkCheck(val('dk-cur')))) return toast('La clave actual no es correcta.'); }
+    else if (dkOn()) return toast('Ya hay una clave de borrado.');
+    const rec = await dkMake(a);
+    const ok = await commit(d => { d.cfg.delKey = rec; }, { ok: f.id === 'dkchg' ? 'Clave de borrado cambiada.' : 'Clave de borrado creada.', log: f.id === 'dkchg' ? 'Cambió la clave de borrado' : 'Creó la clave de borrado', tab: 'admin' });
+    if (ok) { S.dkChange = false; render(); }
   } else if (f.id === 'cform') {
     if (!isAdmin()) return;
     const v = id => Math.round(+val(id));
     const cfg = { base: v('c-base'), k: v('c-k'), kProv: v('c-kp'), provGames: v('c-pg'), cap: v('c-cap'), perRival: true };
     if (![cfg.base, cfg.k, cfg.kProv, cfg.provGames, cfg.cap].every(Number.isFinite) || cfg.k <= 0 || cfg.kProv <= 0 || cfg.provGames < 0 || cfg.cap < 0) return toast('Revisa los valores: K debe ser mayor a cero.');
-    await commit(d => { d.cfg = cfg; }, { ok: 'Ajustes guardados. Todo el histórico se recalculó.', tab: 'admin' });
+    await commit(d => { d.cfg = { ...d.cfg, ...cfg }; }, { ok: 'Ajustes guardados. Todo el histórico se recalculó.', tab: 'admin' });
   }
 });
 let rzT; window.addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(() => document.querySelectorAll('[data-chart]').forEach(drawChart), 150); });
