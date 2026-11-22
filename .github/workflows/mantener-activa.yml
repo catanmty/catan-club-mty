@@ -1,0 +1,10 @@
+name: Mantener la liga activa
+on:
+  schedule:
+    - cron: '17 15 */3 * *'
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS "https://ebxxtelbqydbwpnfmhmx.supabase.co/rest/v1/settings?select=id" -H "apikey: sb_publishable_3aQ3G8PdcPZSy-lXz-BdSQ_rJq5dL-5" > /dev/null
